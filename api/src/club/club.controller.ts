@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Delete } from '@nestjs/common';
 import { ClubService } from './club.service';
-import type { CreateClubDto, UpdateClubDto } from '@types';
+import type { CreateClubDto, UpdateClubDto } from 'types/Club';
 
 @Controller('club')
 export class ClubController {
