@@ -29,7 +29,7 @@ function RouteComponent() {
       await storage.set('defaultClubId', newClub.id)
 
       navigate({
-        to: '/products',
+        to: '/dashboard',
         search: {clubId: newClub.id}
       })
     },

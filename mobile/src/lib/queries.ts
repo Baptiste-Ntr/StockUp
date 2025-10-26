@@ -28,3 +28,33 @@ export const clubQuery = (clubId: string) => queryOptions({
     enabled: !!clubId,
     staleTime: 10 * 60 * 1000
 })
+
+export const categoriesQuery = (clubId: string) => queryOptions({
+    queryKey: ['categories', clubId],
+    queryFn: () => api.categories.getAll(clubId),
+    enabled: !!clubId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000
+})
+
+export const categoryQuery = (categoryId: string, clubId: string) => queryOptions({
+    queryKey: ['category', categoryId, clubId],
+    queryFn: () => api.categories.getById(categoryId, clubId),
+    enabled: !!categoryId && !!clubId,
+    staleTime: 10 * 60 * 1000
+})
+
+export const articlesQuery = (categoryId: string) => queryOptions({
+    queryKey: ['articles', categoryId],
+    queryFn: () => api.articles.getAll(categoryId),
+    enabled: !!categoryId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000
+})
+
+export const articleQuery = (articleId: string, categoryId: string) => queryOptions({
+    queryKey: ['article', articleId, categoryId],
+    queryFn: () => api.articles.getById(articleId, categoryId),
+    enabled: !!articleId && !!categoryId,
+    staleTime: 10 * 60 * 1000
+})

@@ -4,7 +4,10 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { authQuery, userClubQuery } from "@/lib/queries";
-import { api } from "@/lib/api";
+import { api, storage } from "@/lib/api";
+import { Footer } from "@/components/Footer/Footer";
+import { Toaster } from "@/components/ui/sonner";
+import { useEffect, useState } from "react";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -14,36 +17,46 @@ function RootComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: user } = useQuery(authQuery);
-  const {data: userClub} = useQuery(userClubQuery);
+  
+  // 🎯 Vérifier d'abord le localStorage (instantané)
+  const [hasClubInCache, setHasClubInCache] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    if (user) {
+      storage.get('defaultClubId').then(clubId => {
+        setHasClubInCache(!!clubId);
+      });
+    }
+  }, [user]);
 
-  const handleLogout = () => {
-    api.auth.logout();
+  // 🔄 Query de secours uniquement si pas de cache
+  const { data: userClub } = useQuery({
+    ...userClubQuery,
+    enabled: hasClubInCache === false // Seulement si on n'a rien en cache
+  });
+
+  const handleLogout = async () => {
+    await api.auth.logout();
+    // Nettoyer aussi le cache local
+    await storage.remove('defaultClubId');
     queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
     navigate({ to: '/auth/login' });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen min-w-screen bg-gray-50">
       {/* Header avec navigation */}
       <header className="bg-blue-600 text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-xl font-bold hover:opacity-90">
-            ⚾ Lynup-Stock
+          <Link to="/" className="text-xl font-bold text-white">
+            Lynup-Stock
           </Link>
 
           <nav className="flex gap-2 items-center">
             {user ? (
               <>
-                <Link
-                  to="/products"
-                  className="px-4 py-2 rounded-lg transition hover:bg-blue-700"
-                  activeProps={{
-                    className: "bg-blue-700 font-semibold",
-                  }}
-                >
-                  Produits
-                </Link>
-                {!userClub && (
+                {/* Afficher "Nouveau Club" seulement si on est sûr qu'il n'y a pas de club */}
+                {hasClubInCache === false && !userClub && (
                   <Link
                     to="/clubs/new"
                     className="px-4 py-2 rounded-lg transition hover:bg-blue-700"
@@ -89,9 +102,16 @@ function RootComponent() {
       </header>
 
       {/* Pages content */}
-      <main>
+      <main className="min-w-screen">
         <Outlet />
       </main>
+
+      <footer>
+        <Footer />
+      </footer>
+
+      {/* Toaster pour les notifications */}
+      <Toaster />
 
       {/* DevTools en dev */}
       {import.meta.env.DEV && (

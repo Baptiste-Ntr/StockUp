@@ -8,26 +8,34 @@ export const Route = createFileRoute('/')({
     await requireAuth(queryClient)
   },
   loader: async ({ context: { queryClient }}) => {
+    // 🚀 Vérifier d'abord le localStorage (rapide)
+    const cachedClubId = await storage.get('defaultClubId')
+    
+    // Si on a un clubId en cache, on redirige directement sans attendre l'API
+    if (cachedClubId) {
+      throw redirect({
+        to: '/dashboard',
+      })
+    }
+
+    // Sinon, on vérifie via l'API
     try {
       const clubs = await queryClient.ensureQueryData(clubsQuery)
 
-      console.log(clubs)
-
-      if(clubs.length === 0) {
-        throw redirect({to: '/clubs/new'})
+      if (clubs.length === 0) {
+        throw redirect({ to: '/clubs/new' })
       }
 
-      const defaultClubId = await storage.get('defaultClubId')
-
-      console.log(defaultClubId)
-
+      // On a trouvé des clubs, on sauvegarde le premier et on redirige
+      await storage.set('defaultClubId', clubs[0].id)
+      
       throw redirect({
-        to: '/products',
-        search: {clubId: defaultClubId}
+        to: '/dashboard',
       })
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      throw redirect({to: '/clubs/new'})
+    } catch (_err) {
+      // En cas d'erreur, on redirige vers la création de club
+      throw redirect({ to: '/clubs/new' })
     }
   },
   component: () => null

@@ -1,4 +1,4 @@
-import type { Club, CreateClubDto, LoginDto, RegisterDto, User } from "@/types";
+import type { Article, Category, Club, CreateArticleDto, CreateCategoryDto, CreateClubDto, LoginDto, RegisterDto, UpdateArticleDto, UpdateCategoryDto, User } from "@/types";
 import type { ApiError } from "@/types/Api";
 import { Preferences } from '@capacitor/preferences';
 import { CapacitorCookies } from '@capacitor/core';
@@ -106,7 +106,69 @@ export const clubsApi = {
     }
 }
 
+export const categoryApi = {
+    create: (data: CreateCategoryDto): Promise<Category> => {
+        return fetchApi('/category', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+    },
+
+    getAll: (clubId: string): Promise<Category[]> => {
+        return fetchApi(`/category/club/${clubId}`)
+    },
+    
+    getById: (id: string, clubId: string): Promise<Category> => {
+        return fetchApi(`/category/${id}/club/${clubId}`)
+    },
+
+    update: (id: string, data: UpdateCategoryDto): Promise<Category> => {
+        return fetchApi(`/category/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        })
+    },
+
+    delete: (id: string): Promise<void> => {
+        return fetchApi(`/category/${id}`, {
+            method: 'DELETE'
+        })
+    }
+}
+
+export const articleApi = {
+    create: (data: CreateArticleDto): Promise<Article> => {
+        return fetchApi('/articles', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        })
+    },
+
+    getAll: (categoryId: string): Promise<Article[]> => {
+        return fetchApi(`/articles/category/${categoryId}`)
+    },
+    
+    getById: (id: string, categoryId: string): Promise<Article> => {
+        return fetchApi(`/articles/${id}/category/${categoryId}`)
+    },
+
+    update: (id: string, data: UpdateArticleDto): Promise<Article> => {
+        return fetchApi(`/articles/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        })
+    },
+
+    delete: (id: string): Promise<void> => {
+        return fetchApi(`/articles/${id}`, {
+            method: 'DELETE'
+        })
+    }
+}
+
 export const api = {
   auth: authApi,
   clubs: clubsApi,
+  categories: categoryApi,
+  articles: articleApi,
 }
