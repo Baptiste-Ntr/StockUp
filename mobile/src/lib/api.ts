@@ -93,6 +93,13 @@ export const clubsApi = {
         });
     },
 
+    joinClub: (code: string): Promise<Club> => {
+        return fetchApi(`/clubs/join`, {
+            method: "POST",
+            body: JSON.stringify(code)
+        })
+    },
+
     userClub: (): Promise<Club> => {
         return fetchApi('/clubs/user')
     },
@@ -144,8 +151,12 @@ export const articleApi = {
         })
     },
 
-    getAll: (categoryId: string): Promise<Article[]> => {
+    getAllByCategory: (categoryId: string): Promise<Article[]> => {
         return fetchApi(`/articles/category/${categoryId}`)
+    },
+
+    getAllByClub: (clubId: string): Promise<Article[]> => {
+        return fetchApi(`/articles/club/${clubId}`)
     },
     
     getById: (id: string, categoryId: string): Promise<Article> => {

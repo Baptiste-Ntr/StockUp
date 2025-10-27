@@ -42,7 +42,6 @@ export class ClubService {
     }
 
     async getClubByUserId(id: string) {
-        console.log(id)
         return await this.prisma.club.findFirst({
             where: {
                 OR: [

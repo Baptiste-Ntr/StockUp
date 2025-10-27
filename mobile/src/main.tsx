@@ -26,7 +26,13 @@ const queryClient = new QueryClient({
     },
     mutations: {
       retry: 1,
-      networkMode: 'offlineFirst'
+      networkMode: 'offlineFirst',
+      
+      // Configuration globale pour toutes les mutations
+      onSuccess: () => {
+        // Invalider toutes les queries pour forcer le rafraîchissement
+        queryClient.invalidateQueries();
+      }
     }
   }
 })

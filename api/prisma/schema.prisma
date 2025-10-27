@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,46 +12,53 @@ model User {
   email     String   @unique
   password  String
   name      String
-  clubs     Club[]   @relation("UserClubs")
+  imageUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  clubs     Club[]   @relation("UserClubs")
 }
 
 model Club {
   id         String     @id @default(uuid())
   name       String
   inviteCode String
-  owner      User       @relation("UserClubs", fields: [ownerId], references: [id])
   ownerId    String
-  sellers    Seller[]   @relation("ClubSellers")
-  categories Category[] @relation("ClubCategories")
   createdAt  DateTime   @default(now())
+  articles   Article[]  @relation("ClubArticles")
+  categories Category[] @relation("ClubCategories")
+  owner      User       @relation("UserClubs", fields: [ownerId], references: [id])
+  sellers    Seller[]   @relation("ClubSellers")
 }
 
 model Seller {
   id        String   @id @default(uuid())
   name      String
   email     String
-  club      Club     @relation("ClubSellers", fields: [clubId], references: [id])
   clubId    String
   createdAt DateTime @default(now())
+  club      Club     @relation("ClubSellers", fields: [clubId], references: [id])
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  name      String
+  id          String    @id @default(uuid())
+  name        String
   description String
-  club      Club      @relation("ClubCategories", fields: [clubId], references: [id])
-  clubId    String
-  articles  Article[] @relation("CategoryArticles")
-  createdAt DateTime @default(now())
+  clubId      String
+  createdAt   DateTime  @default(now())
+  articles    Article[] @relation("CategoryArticles")
+  club        Club      @relation("ClubCategories", fields: [clubId], references: [id])
 }
 
 model Article {
-  id         String   @id @default(uuid())
-  name       String
+  id          String    @id @default(uuid())
+  name        String
   description String
-  category   Category @relation("CategoryArticles", fields: [categoryId], references: [id])
-  categoryId String
-  createdAt  DateTime @default(now())
+  imageUrl    String?
+  stock       Int?
+  categoryId  String?
+  clubId      String
+  createdAt   DateTime  @default(now())
+  price       Int
+  category    Category? @relation("CategoryArticles", fields: [categoryId], references: [id])
+  club        Club      @relation("ClubArticles", fields: [clubId], references: [id])
 }

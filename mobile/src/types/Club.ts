@@ -30,8 +30,11 @@ export interface Article {
   id: string;
   name: string;
   description: string;
-  category: Category;
-  categoryId: string;
+  price: number;
+  imageUrl: string;
+  stock: number;
+  category?: Category;
+  categoryId?: string;
   createdAt: Date;
 }
 
@@ -43,6 +46,11 @@ export interface CreateClubDto {
 export interface UpdateClubDto {
   name?: string;
   inviteCode?: string;
+}
+
+export interface JoinClubDto {
+  inviteCode: string;
+  clubId: string;
 }
 
 export interface CreateSellerDto {
@@ -70,9 +78,10 @@ export interface UpdateCategoryDto {
 export interface CreateArticleDto {
   name: string;
   description: string;
-  categoryId: string;
+  price: number;
+  categoryId?: string;
+  clubId: Club["id"];
 }
-
 export interface UpdateArticleDto {
   name?: string;
   description?: string;

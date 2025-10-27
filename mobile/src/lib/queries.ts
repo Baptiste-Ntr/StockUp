@@ -44,13 +44,23 @@ export const categoryQuery = (categoryId: string, clubId: string) => queryOption
     staleTime: 10 * 60 * 1000
 })
 
-export const articlesQuery = (categoryId: string) => queryOptions({
-    queryKey: ['articles', categoryId],
-    queryFn: () => api.articles.getAll(categoryId),
+export const articlesCategoryQuery = (categoryId: string) =>
+  queryOptions({
+    queryKey: ["articles", categoryId],
+    queryFn: () => api.articles.getAllByCategory(categoryId),
     enabled: !!categoryId,
     staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000
-})
+    gcTime: 10 * 60 * 1000,
+  });
+
+export const articlesClubQuery = (clubId: string) => 
+    queryOptions({
+      queryKey: ["articles", clubId],
+      queryFn: () => api.articles.getAllByClub(clubId),
+      enabled: !!clubId,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    });
 
 export const articleQuery = (articleId: string, categoryId: string) => queryOptions({
     queryKey: ['article', articleId, categoryId],
