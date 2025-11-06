@@ -1,4 +1,4 @@
-import type { Article, UpdateArticleDto } from "@/types";
+import type { Article, Category, UpdateArticleDto } from "@/types";
 import {
   Card,
   CardContent,
@@ -11,6 +11,7 @@ import { Check, X, Minus, Plus, Package, Trash2 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useState } from "react";
 import { useMutationWithInvalidation } from "@/hooks/useMutationWithInvalidation";
 import { api } from "@/lib/api";
@@ -19,9 +20,11 @@ import "@uploadcare/react-uploader/core.css";
 
 export const EditArticle = ({ 
   data, 
+  categories = [],
   onCancel 
 }: { 
   data: Article;
+  categories?: Category[];
   onCancel: () => void;
 }) => {
   const [name, setName] = useState<string>(data.name);
@@ -29,6 +32,7 @@ export const EditArticle = ({
   const [price, setPrice] = useState<string>(data.price.toString());
   const [stock, setStock] = useState<number>(data.stock ?? 0);
   const [imageUrl, setImageUrl] = useState<string | undefined>(data.imageUrl);
+  const [categoryId, setCategoryId] = useState<string | undefined>(data.categoryId);
 
   const updateArticleMutation = useMutationWithInvalidation({
     mutationFn: (updateData: UpdateArticleDto) => 
@@ -48,7 +52,8 @@ export const EditArticle = ({
       description, 
       stock,
       price: price === "" ? 0 : Number(price),
-      imageUrl
+      imageUrl,
+      categoryId
     });
   };
 
@@ -136,6 +141,34 @@ export const EditArticle = ({
                   }
                 }}
               />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="edit-category">Catégorie</Label>
+              {categories.length < 1 ? (
+                <div className="text-xs text-gray-500 p-2 border border-dashed rounded-md">
+                  Aucune catégorie disponible
+                </div>
+              ) : (
+                <Select 
+                  value={categoryId || "none"} 
+                  onValueChange={(value: string) => 
+                    setCategoryId(value === "none" ? undefined : value)
+                  }
+                  disabled={updateArticleMutation.isPending}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une catégorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Aucune catégorie</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <CardDescription className="flex items-center gap-4">
               Stock :{" "}

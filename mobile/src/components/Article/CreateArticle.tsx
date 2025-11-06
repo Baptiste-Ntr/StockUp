@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useMutationWithInvalidation } from "@/hooks/useMutationWithInvalidation";
 import { FileUploaderRegular } from "@uploadcare/react-uploader";
 import "@uploadcare/react-uploader/core.css";
@@ -52,7 +52,8 @@ export const CreateArticle = ({
         name: "",
         description: "",
         price: 0,
-        clubId
+        clubId,
+        categoryId: undefined
       });
       setPriceInput("");
     },
@@ -116,26 +117,36 @@ export const CreateArticle = ({
               }}
             />
           </div>
-          {categories.length < 1 ? (
-            <Popover>
-              <PopoverTrigger>
-                <div className="flex flex-col gap-3">
-                  <Label className="text-gray-400">Catégorie</Label>
-                  <Input disabled={categories.length < 1}></Input>
-                </div>
-              </PopoverTrigger>
-              <PopoverContent>
-                <p>
-                  Veuillez créer d'abord une categorie
-                </p>
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <Label>Catégorie</Label>
-              <Input></Input>
-            </div>
-          )}
+          <div className="flex flex-col gap-3 w-full">
+            <Label>Catégorie {categories.length < 1 && "(optionnel)"}</Label>
+            {categories.length < 1 ? (
+              <div className="text-sm text-gray-500 p-3 border border-dashed rounded-md">
+                Aucune catégorie disponible. Créez-en une pour organiser vos articles.
+              </div>
+            ) : (
+              <Select 
+                value={articleData.categoryId || "none"} 
+                onValueChange={(value: string) => 
+                  setArticleData((prev) => ({
+                    ...prev,
+                    categoryId: value === "none" ? undefined : value,
+                  }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Aucune catégorie</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
         <DialogFooter>
           <div className="flex gap-3 justify-end">

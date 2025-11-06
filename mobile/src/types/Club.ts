@@ -88,4 +88,5 @@ export interface UpdateArticleDto {
   imageUrl?: string;
   stock?: number;
   price?: number;
+  categoryId?: string;
 }

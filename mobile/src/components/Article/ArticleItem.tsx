@@ -1,4 +1,4 @@
-import type { Article } from "@/types";
+import type { Article, Category } from "@/types";
 import {
   Card,
   CardContent,
@@ -16,9 +16,11 @@ import { useMutationWithInvalidation } from "@/hooks/useMutationWithInvalidation
 import { api } from "@/lib/api";
 
 export const ArticleItem = ({ 
-  data 
+  data,
+  categories = []
 }: { 
   data: Article;
+  categories?: Category[];
 }) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -57,7 +59,8 @@ export const ArticleItem = ({
   if (isEditing) {
     return (
       <EditArticle 
-        data={data} 
+        data={data}
+        categories={categories}
         onCancel={() => setIsEditing(false)}
       />
     );
@@ -81,7 +84,14 @@ export const ArticleItem = ({
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <CardTitle>{data.name}</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>{data.name}</CardTitle>
+              {data.category && (
+                <Badge variant="outline" className="text-xs">
+                  {data.category.name}
+                </Badge>
+              )}
+            </div>
             <CardDescription>{data.description}</CardDescription>
             <CardDescription className="flex items-center gap-4">
               Stock :{" "}

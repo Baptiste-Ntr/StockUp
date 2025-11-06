@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as ClubsNewRouteImport } from './routes/clubs/new'
@@ -19,6 +20,11 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InventoryIndexRoute = InventoryIndexRouteImport.update({
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/clubs/new': typeof ClubsNewRoute
   '/dashboard': typeof DashboardIndexRoute
   '/inventory': typeof InventoryIndexRoute
+  '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/clubs/new': typeof ClubsNewRoute
   '/dashboard': typeof DashboardIndexRoute
   '/inventory': typeof InventoryIndexRoute
+  '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/clubs/new': typeof ClubsNewRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/inventory/': typeof InventoryIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/clubs/new'
     | '/dashboard'
     | '/inventory'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/clubs/new'
     | '/dashboard'
     | '/inventory'
+    | '/settings'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/clubs/new'
     | '/dashboard/'
     | '/inventory/'
+    | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   ClubsNewRoute: typeof ClubsNewRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   InventoryIndexRoute: typeof InventoryIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inventory/': {
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClubsNewRoute: ClubsNewRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   InventoryIndexRoute: InventoryIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

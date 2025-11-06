@@ -3,10 +3,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { requireAuth } from '@/lib/auth-middleware';
 import { requireClub } from '@/lib/club-middleware';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-import { PlusCircle, ScanBarcodeIcon } from 'lucide-react';
+import { PlusCircle, ScanBarcodeIcon, FolderPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { CreateArticle } from '@/components/Article/CreateArticle';
+import { CreateCategoryDialog } from '@/components/inventory/CreateCategoryDialog';
 import { useState } from 'react';
 import { ListArticles } from '@/components/Article/ListArticles';
 
@@ -45,7 +46,10 @@ function RouteComponent() {
             <EmptyDescription>Vous n'avez pas encore renseigné d'articles dans votre boutique</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button onClick={() => setIsCreateArticleOpen(true)}>Créer votre premier article</Button>
+            <div className="flex gap-3 flex-wrap justify-center">
+              <Button onClick={() => setIsCreateArticleOpen(true)}>Créer votre premier article</Button>
+              <CreateCategoryDialog clubId={userClub.id} />
+            </div>
           </EmptyContent>
         </Empty>
         <CreateArticle open={isCreateArticleOpen} setOpen={setIsCreateArticleOpen} categories={categories} clubId={userClub.id}/>
@@ -54,13 +58,19 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-5 py-4">
-      <div className="flex justify-center">
+      {/* Boutons d'actions principales */}
+      <div className="flex justify-center gap-3 px-4 flex-wrap">
         <Button className="p-2" onClick={() => setIsCreateArticleOpen(true)}>
           <PlusCircle />
-          Ajouter un nouvel article
+          Ajouter un article
         </Button>
+        <CreateCategoryDialog clubId={userClub.id} />
       </div>
-      <ListArticles articles={articles} />
+
+      {/* Liste des articles avec filtres, recherche et tri intégrés */}
+      <ListArticles articles={articles} categories={categories} />
+
+      {/* Dialogs */}
       <CreateArticle
         open={isCreateArticleOpen}
         setOpen={setIsCreateArticleOpen}

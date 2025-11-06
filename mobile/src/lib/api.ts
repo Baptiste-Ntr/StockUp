@@ -76,6 +76,13 @@ export const authApi = {
         return fetchApi('/auth/me');
     },
 
+    updateProfile: (data: { name?: string; imageUrl?: string }): Promise<User> => {
+        return fetchApi('/auth/profile', {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        });
+    },
+
     logout: async (): Promise<void> => {
         await fetchApi('/auth/logout', {
             method: 'POST'

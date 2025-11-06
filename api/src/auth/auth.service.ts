@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -46,6 +47,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        imageUrl: user.imageUrl,
       },
     };
   }
@@ -79,6 +81,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        imageUrl: user.imageUrl,
       },
     };
   }
@@ -90,6 +93,7 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
+        imageUrl: true,
         createdAt: true,
       },
     });
@@ -103,6 +107,34 @@ export class AuthService {
 
   async getProfile(userId: string) {
     return this.validateUser(userId);
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur non trouvé');
+    }
+
+    // Mettre à jour uniquement les champs fournis
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(updateProfileDto.name && { name: updateProfileDto.name }),
+        ...(updateProfileDto.imageUrl !== undefined && { imageUrl: updateProfileDto.imageUrl }),
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        imageUrl: true,
+        createdAt: true,
+      },
+    });
+
+    return updatedUser;
   }
 }
 

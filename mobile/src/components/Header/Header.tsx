@@ -1,24 +1,24 @@
-import { Link, useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useMatchRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { authQuery } from "@/lib/queries";
-import { api, storage } from "@/lib/api";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Header = () => {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const matchRoute = useMatchRoute();
   const { data: user } = useQuery(authQuery);
-
-  const handleLogout = async () => {
-    await api.auth.logout();
-    await storage.remove("defaultClubId");
-    queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
-    navigate({ to: "/auth/login" });
-  };
 
   const isAuth =
     matchRoute({ to: "/auth/login", fuzzy: true }) ||
     matchRoute({ to: "/auth/register", fuzzy: true });
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   if (isAuth) return null;
 
@@ -30,36 +30,16 @@ export const Header = () => {
         </Link>
 
         <nav className="flex gap-2 items-center">
-          {user ? (
+          {user && (
             <>
-              <span className="text-sm opacity-75 ml-2">{user.name}</span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 rounded-lg transition hover:bg-blue-700 ml-2"
-              >
-                Déconnexion
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/auth/login"
-                className="px-4 py-2 rounded-lg transition hover:bg-blue-700"
-                activeProps={{
-                  className: "bg-blue-700 font-semibold",
-                }}
-              >
-                Connexion
-              </Link>
-              <Link
-                to="/auth/register"
-                className="px-4 py-2 rounded-lg transition hover:bg-blue-700"
-                activeProps={{
-                  className: "bg-blue-700 font-semibold",
-                }}
-              >
-                Inscription
-              </Link>
+              <div className="flex items-center gap-3">
+                <Avatar className="w-9 h-9 border-2 border-white/20">
+                  <AvatarImage src={user.imageUrl} alt={user.name} className="object-cover" />
+                  <AvatarFallback className="text-sm font-semibold bg-blue-700 text-white">
+                    {getInitials(user.name)}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
             </>
           )}
         </nav>
