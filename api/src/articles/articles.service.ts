@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateArticleDto, UpdateArticleDto } from 'types';
+import { UploadcareService } from '../uploadcare/uploadcare.service';
 
 @Injectable()
 export class ArticlesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadcareService: UploadcareService,
+  ) {}
 
   async getAllByCategory(categoryId: string) {
     const category = await this.prisma.category.findUnique({
@@ -17,6 +21,7 @@ export class ArticlesService {
 
     return this.prisma.article.findMany({
       where: { categoryId: categoryId },
+      orderBy: { createdAt: 'asc' },
     });
   }
 
@@ -33,7 +38,8 @@ export class ArticlesService {
       where: { clubId: clubId },
       include: {
         category: true
-      }
+      },
+      orderBy: { createdAt: 'asc' }
     });
   }
 
@@ -77,15 +83,53 @@ export class ArticlesService {
   }
 
   async update(dto: UpdateArticleDto, id: string) {
-    return this.prisma.article.update({
+    // Récupérer l'article actuel pour obtenir l'ancienne image
+    const currentArticle = await this.prisma.article.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+
+    // Mettre à jour l'article
+    const updatedArticle = await this.prisma.article.update({
       where: { id },
       data: dto,
     });
+
+    // Si l'image a changé, supprimer l'ancienne
+    if (
+      currentArticle?.imageUrl &&
+      dto.imageUrl !== undefined &&
+      currentArticle.imageUrl !== dto.imageUrl
+    ) {
+      // Suppression asynchrone sans bloquer la réponse
+      this.uploadcareService.deleteImage(currentArticle.imageUrl).catch(err => {
+        console.error('Failed to delete old image:', err);
+      });
+    }
+
+    return updatedArticle;
   }
 
   async delete(id: string) {
-    return this.prisma.article.delete({
+    // Récupérer l'article pour obtenir l'URL de l'image
+    const article = await this.prisma.article.findUnique({
+      where: { id },
+      select: { imageUrl: true },
+    });
+
+    // Supprimer l'article de la base de données
+    const deletedArticle = await this.prisma.article.delete({
       where: { id },
     });
+
+    // Supprimer l'image sur Uploadcare si elle existe
+    if (article?.imageUrl) {
+      // Suppression asynchrone sans bloquer la réponse
+      this.uploadcareService.deleteImage(article.imageUrl).catch(err => {
+        console.error('Failed to delete image:', err);
+      });
+    }
+
+    return deletedArticle;
   }
 }

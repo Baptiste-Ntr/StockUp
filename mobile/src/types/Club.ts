@@ -85,4 +85,7 @@ export interface CreateArticleDto {
 export interface UpdateArticleDto {
   name?: string;
   description?: string;
+  imageUrl?: string;
+  stock?: number;
+  price?: number;
 }

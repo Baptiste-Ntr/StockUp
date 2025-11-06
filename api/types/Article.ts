@@ -27,4 +27,5 @@ export interface UpdateArticleDto {
   description?: string;
   imageUrl?: string;
   stock?: number;
+  price?: number;
 }

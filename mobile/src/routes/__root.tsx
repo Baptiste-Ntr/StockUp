@@ -1,5 +1,5 @@
 // src/routes/__root.tsx
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet, useMatchRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/Header/Header";
@@ -11,6 +11,12 @@ interface RouterContext {
 }
 
 function RootComponent() {
+  const matchRoute = useMatchRoute();
+  
+  const isAuth =
+    matchRoute({ to: "/auth/login", fuzzy: true }) ||
+    matchRoute({ to: "/auth/register", fuzzy: true });
+
   return (
     <div className="min-h-screen min-w-screen bg-gray-50">
       <Header />
@@ -22,9 +28,11 @@ function RootComponent() {
         <Toaster />
       </main>
 
-      <footer>
-        <Footer />
-      </footer>
+      {!isAuth && (
+        <footer>
+          <Footer />
+        </footer>
+      )}
 
       <Toaster />
 
