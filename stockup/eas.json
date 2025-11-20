@@ -12,10 +12,7 @@
       }
     },
     "production": {
-      "distribution": "store",
-      "android": {
-        "buildType": "aab"
-      }
+      "distribution": "store"
     }
   },
   "submit": {
