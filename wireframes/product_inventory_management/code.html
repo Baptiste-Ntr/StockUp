@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynup-Stock Inventory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+              "success": "#28A745",
+              "warning": "#FFC107",
+              "danger": "#DC3545",
+              "text-light": "#212529",
+              "text-dark": "#f8f9fa",
+              "border-light": "#E9ECEF",
+              "border-dark": "#2a3b4e",
+              "card-light": "#ffffff",
+              "card-dark": "#1a2734"
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: inherit;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+<div class="flex items-center justify-between h-16 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">inventory_2</span>
+<p class="text-xl font-bold tracking-tight">Lynup-Stock</p>
+</div>
+<div class="flex items-center justify-end">
+<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-transparent text-text-light dark:text-text-dark">
+<span class="material-symbols-outlined text-3xl">account_circle</span>
+</button>
+</div>
+</div>
+<div class="w-full border-b border-border-light dark:border-border-dark"></div>
+</header>
+<main class="flex-grow p-4 space-y-4">
+<!-- Search, Filter, and Add Button -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="flex-grow">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-slate-500 flex border-y border-l border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark items-center justify-center pl-4 rounded-l-lg">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark h-full placeholder:text-slate-500 px-4 text-base font-normal leading-normal" placeholder="Search by product name..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex-shrink-0">
+<button class="flex w-full sm:w-auto min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 gap-2 text-sm font-medium leading-normal bg-primary text-white">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+<span class="truncate">Add New Product</span>
+</button>
+</div>
+</div>
+<!-- Chips for Filtering -->
+<div class="flex gap-2 pb-2 overflow-x-auto">
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary/10 text-primary px-4">
+<p class="text-sm font-medium leading-normal">All</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-200 dark:bg-slate-700 px-4">
+<p class="text-sm font-medium leading-normal">Baseball</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-200 dark:bg-slate-700 px-4">
+<p class="text-sm font-medium leading-normal">Softball</p>
+</button>
+<button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-200 dark:bg-slate-700 px-4">
+<p class="text-sm font-medium leading-normal">Accessories</p>
+</button>
+</div>
+<!-- Product List / Cards -->
+<div class="space-y-4">
+<!-- Card 1 -->
+<div class="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4 shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4 w-full sm:w-auto">
+<div class="w-20 h-20 bg-center bg-no-repeat bg-cover rounded-lg flex-shrink-0" data-alt="Easton Ghost baseball bat leaning against a white background" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBt0fliIqxeYQwg3sdg91FgVhWAzESj3xHgMWZ77qDR9V6m_1Syyd_UifOWsGwZ637J3Xj42BgQRy6_owA8HPrdfXe5LahPURyE5F8hhHwHvWNu1CWEtdGWeTwIG0P1NZFESE7QRQX_KdpqJxao240sDmW96crpzCVbNyhwd1gFhV5Ld51Vv0N2RQL6fUzqyt6-OyoqFqS8yhdCO-GOjKPmiibelXkGKUnsLO92lnXMvpETtl0j58D1_UgWw9F8DfN8H2ejG8fI3zY");'></div>
+<div class="flex flex-col gap-1 w-full">
+<p class="text-base font-bold leading-tight">Easton Ghost Bat</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal">Category: Baseball, Size: 32 inch</p>
+<div class="flex items-center gap-2">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Stock:</span>
+<span class="inline-flex items-center rounded-full bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger">8</span>
+</div>
+</div>
+</div>
+<div class="flex sm:flex-col justify-between sm:items-end pt-2 sm:pt-0 border-t sm:border-t-0 border-border-light dark:border-border-dark">
+<div class="text-right">
+<p class="text-base font-semibold">$299.99</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Total: $2,399.92</p>
+</div>
+<div class="flex items-center gap-2 mt-auto">
+<button class="flex items-center justify-center rounded-lg h-8 w-8 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-8 w-8 text-danger hover:bg-danger/10">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4 shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4 w-full sm:w-auto">
+<div class="w-20 h-20 bg-center bg-no-repeat bg-cover rounded-lg flex-shrink-0" data-alt="Brown leather Rawlings baseball glove on a grass field" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuConixTU-ADTnf_eBaj8ro4NNEDw6_QqyU0QImlE_LI1OyexzC8aFdNQlueb6_l7umCKuw33iVDTYjrCTEoFdlH1uUKPju14-KHahSddQS1ikZVNpCAMgjlbcbHPRi-X983pnYuPycS9ZfnZHNXS9z3-N-FD-QUSJmlNHfUVoUyNR2a6FJrhbdZ8GXQIeqsdhFr4rm9Zj7n3y3Q74IcjKYRqO4laaMPu2M-BzWAP_PZv1vAzaclI86HOG2o6ge4BfppuetQXp-lmMs");'></div>
+<div class="flex flex-col gap-1 w-full">
+<p class="text-base font-bold leading-tight">Rawlings Glove</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal">Category: Softball, Size: Youth L/XL</p>
+<div class="flex items-center gap-2">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Stock:</span>
+<span class="inline-flex items-center rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-warning">25</span>
+</div>
+</div>
+</div>
+<div class="flex sm:flex-col justify-between sm:items-end pt-2 sm:pt-0 border-t sm:border-t-0 border-border-light dark:border-border-dark">
+<div class="text-right">
+<p class="text-base font-semibold">$149.99</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Total: $3,749.75</p>
+</div>
+<div class="flex items-center gap-2 mt-auto">
+<button class="flex items-center justify-center rounded-lg h-8 w-8 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-8 w-8 text-danger hover:bg-danger/10">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-xl bg-card-light dark:bg-card-dark p-4 shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4 w-full sm:w-auto">
+<div class="w-20 h-20 bg-center bg-no-repeat bg-cover rounded-lg flex-shrink-0" data-alt="White baseball helmet with a blue logo on a clean surface" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEga8LwVuM5T5vREmZzqWJLDlboph9fP1GUl7Dl0x04iRgzYZHa6R43x9ldNSxJSOjd2Q6NPzPfl4ZdChQsd7rAYqW3X_9UEAr6l7iDlDFnYk3Fp0psgWNTYQSMSD3WVXk1nc7rFdmPEMQ5Rp7Xs-7d8Tbpk1GXJrYi_tle34ITI4BOdQWriXsgmsyIUrh7e-sXtIEfZZeBr5wDFBYiS3Wp6m_N5Q4ZQBMt9LoIuxfi7j-ifiyGmqJ7VkLQ_QBo4FYigLmZzif7sI");'></div>
+<div class="flex flex-col gap-1 w-full">
+<p class="text-base font-bold leading-tight">Batting Helmet</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal">Category: Accessories, Size: Adult M</p>
+<div class="flex items-center gap-2">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Stock:</span>
+<span class="inline-flex items-center rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success">78</span>
+</div>
+</div>
+</div>
+<div class="flex sm:flex-col justify-between sm:items-end pt-2 sm:pt-0 border-t sm:border-t-0 border-border-light dark:border-border-dark">
+<div class="text-right">
+<p class="text-base font-semibold">$49.99</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Total: $3,899.22</p>
+</div>
+<div class="flex items-center gap-2 mt-auto">
+<button class="flex items-center justify-center rounded-lg h-8 w-8 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-xl">edit</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-8 w-8 text-danger hover:bg-danger/10">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State -->
+<!-- <div class="flex flex-col items-center justify-center py-16 text-center rounded-xl bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark">
+                    <span class="material-symbols-outlined text-6xl text-slate-400 dark:text-slate-500">inventory</span>
+                    <h3 class="mt-4 text-lg font-semibold text-text-light dark:text-text-dark">No products found</h3>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Add your first product to get started!</p>
+                    <button class="mt-6 flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 gap-2 text-sm font-medium leading-normal bg-primary text-white">
+                        <span class="material-symbols-outlined text-lg">add_circle</span>
+                        <span>Add New Product</span>
+                    </button>
+                </div> -->
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between pt-4">
+<button class="flex items-center justify-center gap-2 h-9 px-3 rounded-lg text-sm font-medium border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+<span>Previous</span>
+</button>
+<div class="text-sm text-slate-600 dark:text-slate-400">Page 1 of 10</div>
+<button class="flex items-center justify-center gap-2 h-9 px-3 rounded-lg text-sm font-medium border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark hover:bg-slate-100 dark:hover:bg-slate-700">
+<span>Next</span>
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+</body></html>

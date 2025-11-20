@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ajouter un produit - Lynup-Stock</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+              "text-light": "#0d141b",
+              "text-dark": "#f0f2f4",
+              "border-light": "#cfdbe7",
+              "border-dark": "#34404c",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .form-input {
+            @apply flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 focus:border-primary h-14 placeholder:text-gray-400 dark:placeholder:text-gray-500 p-3.5 text-base font-normal leading-normal;
+        }
+        select.form-input {
+            --select-button-svg: url('data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(107,114,128)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e');
+             background-image: var(--select-button-svg);
+             background-position: right 0.75rem center;
+             background-repeat: no-repeat;
+             background-size: 1.25em;
+             padding-right: 2.5rem;
+             -webkit-appearance: none;
+             -moz-appearance: none;
+             appearance: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex h-14 items-center border-b border-border-light dark:border-border-dark bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm px-4">
+<button class="text-primary font-medium text-base">Annuler</button>
+<h1 class="text-text-light dark:text-text-dark text-lg font-bold flex-1 text-center">Ajouter un produit</h1>
+<div class="w-[58px]"></div> <!-- Spacer for balance -->
+</header>
+<!-- Main Content -->
+<main class="flex-1 pb-28">
+<div class="p-4 space-y-6">
+<!-- Image Upload Section -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-border-light dark:border-border-dark px-6 py-10">
+<div class="flex max-w-[480px] flex-col items-center gap-2">
+<span class="material-symbols-outlined text-4xl text-gray-400 dark:text-gray-500">add_photo_alternate</span>
+<p class="text-text-light dark:text-text-dark text-lg font-bold text-center">Ajouter une image</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal text-center">Téléchargez une photo du produit.</p>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary/20 text-primary text-sm font-bold">
+<span class="truncate">Choisir une image</span>
+</button>
+</div>
+<!-- Image Preview -->
+<div class="flex space-x-3 overflow-x-auto pb-2">
+<div class="relative shrink-0">
+<img class="size-24 rounded-lg object-cover" data-alt="A baseball glove with a ball" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnr41ltitxDjH6_wqQjnTCjSunAZbZw1jzokdU0rwjR3Qe3za2VbmaUbn5Jj3LEwqPFRgTnDWKgpt8h96e2M0ErKWqSyXUnKOXglUjIClx9p7DdHk5qZwkaP8oDj5hz6Stkk6VS3p0oN_L_qduB01r64B-USOPRYOYuAdCm5Gra-0YbpnyJCLZzWmrBFXndWW23wI-MYiHW1Zmwi-spdytsPlD5i_iZSG0Fu1nH4pk7qmAEGrPH6wAqCq9PVMw92mvlIZ2gfqGHcw"/>
+<button class="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-gray-700 text-white">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<div class="relative shrink-0">
+<img class="size-24 rounded-lg object-cover" data-alt="A softball on green grass" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_3KV8bG__uW6UM9FdAjaugD1g6BB7bw939kJWxE8wmKixqXU0-jJyJNS7iXYel1zs_HfBxIMpv5sjFx0b67vzh8MHV_MjsMMgdYmR4O8jlc0mgMn5jNG0PJae1PIULElOPb2MAaiFH3kRPf4YyOKIeEq1KNZc3wv-_YPGu4abDz0inr6HGa-CJuAX-HNXQv9ihGK0DouLU5sZ6Uj0D8lXUKmafVQuQ8munQkOtjZ1mI_IGp4FH_luhTJbClsEFYPiTqD8636vG5Y"/>
+<button class="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full bg-gray-700 text-white">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Details Form -->
+<div class="flex flex-col gap-5">
+<label class="flex flex-col w-full">
+<p class="text-text-light dark:text-text-dark text-base font-medium pb-2">Nom du produit</p>
+<input class="form-input" placeholder="Entrez le nom du produit" value=""/>
+</label>
+<label class="flex flex-col w-full">
+<p class="text-text-light dark:text-text-dark text-base font-medium pb-2">Description</p>
+<textarea class="form-input min-h-36" placeholder="Entrez la description du produit"></textarea>
+</label>
+<label class="flex flex-col w-full">
+<p class="text-text-light dark:text-text-dark text-base font-medium pb-2">Catégorie</p>
+<select class="form-input">
+<option>Baseball</option>
+<option>Softball</option>
+<option>Accessoires</option>
+<option>Vêtements</option>
+</select>
+</label>
+<div class="flex gap-4">
+<label class="flex flex-col flex-1">
+<p class="text-text-light dark:text-text-dark text-base font-medium pb-2">Prix</p>
+<div class="relative">
+<span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">€</span>
+<input class="form-input pl-7" placeholder="0.00" type="number" value=""/>
+</div>
+</label>
+<label class="flex flex-col flex-1">
+<p class="text-text-light dark:text-text-dark text-base font-medium pb-2">Quantité</p>
+<div class="relative">
+<input class="form-input text-center" placeholder="0" type="number" value=""/>
+<button class="absolute inset-y-0 left-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-primary">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<button class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-primary">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+</label>
+</div>
+<label class="flex flex-col w-full">
+<p class="text-text-light dark:text-text-dark text-base font-medium pb-2">Taille / Variante</p>
+<input class="form-input" placeholder="ex: Small, Red" value=""/>
+</label>
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-primary/20 text-primary text-sm font-bold gap-2">
+<span class="material-symbols-outlined text-xl">add_circle</span>
+<span class="truncate">Ajouter une autre variante</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-10 bg-background-light dark:bg-background-dark p-4 border-t border-border-light dark:border-border-dark">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-6 bg-primary text-white text-base font-bold">
+<span class="truncate">Enregistrer le produit</span>
+</button>
+</footer>
+</div>
+</body></html>

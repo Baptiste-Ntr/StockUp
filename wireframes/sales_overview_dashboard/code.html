@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynup-Stock Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#137fec",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Lexend", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col">
+<div class="sticky top-0 z-10 flex items-center bg-background-light/80 p-4 pb-2 backdrop-blur-sm dark:bg-background-dark/80 justify-between">
+<div class="flex size-12 shrink-0 items-center">
+<h2 class="text-slate-900 dark:text-slate-50 text-xl font-bold leading-tight tracking-[-0.015em] flex-1">Lynup-Stock</h2>
+</div>
+<div class="flex w-12 items-center justify-end">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAlzMM7LNVQvRXm-BOHkem0HXQF1eayg2Yus5YKT_JXV9wGtfbkdGvrYZB8Ssp9Me-rUP6QWyk5TqBGQN-FYy7z88T15L9_jxkCQKzKwBFMj_MGiRyorSX-3bC46Q1OE4o7FXUSavYWNQfKwiK_alGVNISjsPFbXjKiNQ68N-SLKKjSVPTBMZpWibYMjweokzHtckq8fW935lDTqLTCa1LzOUlLkglSoLwlwffRnhuvj74BvQEMX2Fe1ZW_6YdnaqWYZchU6vnwKgk");'></div>
+</div>
+</div>
+<main class="flex-1 pb-24">
+<h2 class="text-slate-900 dark:text-slate-50 tracking-light text-[28px] font-bold leading-tight px-4 text-left pb-3 pt-5">Welcome back, Alex!</h2>
+<div class="flex px-4 py-3">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 flex-1 bg-primary text-white gap-2 pl-5 text-base font-bold leading-normal tracking-[0.015em]">
+<span class="material-symbols-outlined text-white">add_circle</span>
+<span class="truncate">Add a Sell</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-4 px-4 py-6">
+<div class="flex w-full flex-1 flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6">
+<p class="text-slate-900 dark:text-slate-50 text-base font-medium leading-normal">Last Sells</p>
+<div class="flex flex-col gap-4 pt-4">
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">sports_baseball</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">Easton Ghost Bat</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Qty: 1</p>
+</div>
+<div class="text-right">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">$349.99</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Just now</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">sports_cricket</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">Rawlings R9 Glove</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Qty: 1</p>
+</div>
+<div class="text-right">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">$129.95</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">5 min ago</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">sports_volleyball</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">Official League Balls (12)</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Qty: 2</p>
+</div>
+<div class="text-right">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">$198.00</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">1 hour ago</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">skull</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">Mach Helmet</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Qty: 1</p>
+</div>
+<div class="text-right">
+<p class="text-slate-900 dark:text-slate-50 font-medium leading-normal">$59.99</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm">3 hours ago</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex w-full flex-1 flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6">
+<p class="text-slate-900 dark:text-slate-50 text-base font-medium leading-normal">Top Selling Products</p>
+<p class="text-slate-900 dark:text-slate-50 tracking-light text-[32px] font-bold leading-tight truncate">540 Units</p>
+<div class="flex gap-1">
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">This Month</p>
+<p class="text-green-600 dark:text-green-500 text-base font-medium leading-normal">+8.1%</p>
+</div>
+<div class="grid min-h-[180px] gap-x-4 gap-y-6 grid-cols-[auto_1fr] items-center py-3">
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Glove X</p>
+<div class="h-4 flex-1 rounded-full bg-slate-100 dark:bg-slate-800"><div class="bg-primary h-full rounded-full" style="width: 100%;"></div></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Bat A</p>
+<div class="h-4 flex-1 rounded-full bg-slate-100 dark:bg-slate-800"><div class="bg-primary h-full rounded-full" style="width: 70%;"></div></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Helmet B</p>
+<div class="h-4 flex-1 rounded-full bg-slate-100 dark:bg-slate-800"><div class="bg-primary h-full rounded-full" style="width: 70%;"></div></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Ball Z</p>
+<div class="h-4 flex-1 rounded-full bg-slate-100 dark:bg-slate-800"><div class="bg-primary h-full rounded-full" style="width: 20%;"></div></div>
+</div>
+</div>
+<div class="flex w-full flex-1 flex-col gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6">
+<p class="text-slate-900 dark:text-slate-50 text-base font-medium leading-normal">Revenue Overview</p>
+<p class="text-slate-900 dark:text-slate-50 tracking-light text-[32px] font-bold leading-tight truncate">$2,450</p>
+<div class="flex gap-1">
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">This Month</p>
+<p class="text-red-500 dark:text-red-400 text-base font-medium leading-normal">-1.5%</p>
+</div>
+<div class="grid min-h-[180px] grid-flow-col gap-6 grid-rows-[1fr_auto] items-end justify-items-center px-3 pt-6">
+<div class="bg-primary w-full rounded-t" style="height: 30%;"></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Bats</p>
+<div class="bg-primary w-full rounded-t" style="height: 50%;"></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Gloves</p>
+<div class="bg-primary w-full rounded-t" style="height: 10%;"></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Balls</p>
+<div class="bg-primary w-full rounded-t" style="height: 10%;"></div>
+<p class="text-slate-500 dark:text-slate-400 text-[13px] font-bold leading-normal tracking-[0.015em]">Apparel</p>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 px-4 pb-3 pt-2 backdrop-blur-sm">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+</div>
+<p class="text-primary text-xs font-medium leading-normal tracking-[0.015em]">Dashboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium leading-normal tracking-[0.015em]">Inventory</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium leading-normal tracking-[0.015em]">Sales</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
+</a>
+</div>
+</div>
+</body></html>
