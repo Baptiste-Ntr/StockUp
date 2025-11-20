@@ -15,29 +15,29 @@ export function StatCard({ title, value, change, subtitle }: StatCardProps) {
   const hasChange = change !== undefined && change !== 0;
 
   return (
-    <View className="bg-card rounded-lg p-4 border border-border">
-      <Text className="text-sm text-muted-foreground mb-1">{title}</Text>
-      <Text className="text-3xl font-bold mb-2">{value}</Text>
-      
+    <View className="rounded-lg border border-border bg-card p-4">
+      <Text className="mb-1 text-sm text-muted-foreground">{title}</Text>
+      <Text className="mb-2 text-3xl font-bold">{value}</Text>
+
       {hasChange && (
-        <View className="flex-row items-center">
-          <Icon
-            as={isPositive ? TrendingUpIcon : TrendingDownIcon}
-            size={16}
-            className={isPositive ? 'text-green-600' : 'text-red-600'}
-          />
-          <Text className={`text-sm font-semibold ml-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {isPositive ? '+' : ''}{change.toFixed(1)}%
-          </Text>
-          {subtitle && (
-            <Text className="text-xs text-muted-foreground ml-2">{subtitle}</Text>
-          )}
+        <View className="flex-col items-start">
+          <View className="flex-row items-center">
+            <Icon
+              as={isPositive ? TrendingUpIcon : TrendingDownIcon}
+              size={16}
+              className={isPositive ? 'text-green-600' : 'text-red-600'}
+            />
+            <Text
+              className={`ml-1 text-sm font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+              {isPositive ? '+' : ''}
+              {change.toFixed(1)}%
+            </Text>
+          </View>
+          {subtitle && <Text className="ml-2 text-xs text-muted-foreground">{subtitle}</Text>}
         </View>
       )}
-      
-      {!hasChange && subtitle && (
-        <Text className="text-xs text-muted-foreground">{subtitle}</Text>
-      )}
+
+      {!hasChange && subtitle && <Text className="text-xs text-muted-foreground">{subtitle}</Text>}
     </View>
   );
 }

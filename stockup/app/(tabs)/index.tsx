@@ -71,7 +71,7 @@ export default function DashboardScreen() {
         {/* Bouton principal - Ajouter une vente */}
         <Button
           onPress={() => router.push('/add-sale')}
-          className="w-full mb-6 py-4"
+          className="w-full mb-6"
           size="lg">
           <Icon as={PlusCircleIcon} size={24} className="text-primary-foreground" />
           <Text className="text-primary-foreground font-bold text-lg ml-2">
