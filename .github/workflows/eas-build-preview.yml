@@ -39,21 +39,42 @@ jobs:
 
       - name: 🚀 Build Android APK
         working-directory: ./stockup
-        run: eas build -p android --profile preview --non-interactive --no-wait
+        run: |
+          # Lance le build et capture l'output
+          eas build -p android --profile preview --non-interactive > build_output.txt 2>&1
+          cat build_output.txt
         id: build
 
       - name: 📋 Get Build Details
         id: build-info
         working-directory: ./stockup
         run: |
-          # Récupère l'URL du dernier build
-          BUILD_URL=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl // "N/A"')
-          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
-          EXPO_URL="https://expo.dev/accounts/$(jq -r '.expo.owner' app.json)/projects/$(jq -r '.expo.slug' app.json)/builds/${BUILD_ID}"
+          # Attendre quelques secondes pour que le build soit enregistré
+          sleep 5
           
-          echo "build_url=${BUILD_URL}" >> $GITHUB_OUTPUT
+          # Récupère les infos du dernier build
+          BUILD_DATA=$(eas build:list --platform android --limit 1 --json --non-interactive 2>/dev/null || echo "[]")
+          
+          if [ "$BUILD_DATA" != "[]" ] && [ ! -z "$BUILD_DATA" ]; then
+            BUILD_ID=$(echo "$BUILD_DATA" | jq -r '.[0].id // ""')
+          else
+            BUILD_ID=""
+          fi
+          
+          # Crée les URLs
+          OWNER=$(jq -r '.expo.owner // "baptiste-ntr"' app.json)
+          SLUG=$(jq -r '.expo.slug // "stockup"' app.json)
+          
+          if [ ! -z "$BUILD_ID" ]; then
+            EXPO_URL="https://expo.dev/accounts/${OWNER}/projects/${SLUG}/builds/${BUILD_ID}"
+          else
+            EXPO_URL="https://expo.dev/accounts/${OWNER}/projects/${SLUG}/builds"
+          fi
+          
           echo "expo_url=${EXPO_URL}" >> $GITHUB_OUTPUT
           echo "build_id=${BUILD_ID}" >> $GITHUB_OUTPUT
+          echo "owner=${OWNER}" >> $GITHUB_OUTPUT
+          echo "slug=${SLUG}" >> $GITHUB_OUTPUT
 
       - name: 🏷️ Create Release
         uses: softprops/action-gh-release@v1
@@ -61,27 +82,35 @@ jobs:
           tag_name: preview-${{ github.sha }}
           name: "📱 Preview Build - ${{ github.event.head_commit.message }}"
           body: |
-            ## 🎉 Nouveau build preview disponible !
+            ## 🎉 Nouveau build preview en cours !
             
             **Branche:** `develop`
-            **Commit:** ${{ github.sha }}
+            **Commit:** `${{ github.sha }}`
             **Message:** ${{ github.event.head_commit.message }}
             
             ### 📲 Installation
             
-            Scannez le QR code ou ouvrez ce lien sur votre appareil Android :
+            Le build est en cours de génération sur EAS. Une fois terminé (environ 10-15 minutes), vous pourrez télécharger l'APK ici :
             
-            🔗 **[Télécharger l'APK](${{ steps.build-info.outputs.expo_url }})**
+            🔗 **[Voir le build sur Expo](${{ steps.build-info.outputs.expo_url }})**
             
             ### ℹ️ Informations du build
             
-            - **Build ID:** `${{ steps.build-info.outputs.build_id }}`
+            - **Projet:** `${{ steps.build-info.outputs.owner }}/${{ steps.build-info.outputs.slug }}`
             - **Plateforme:** Android (APK)
             - **Profile:** preview
+            - **Build ID:** ${{ steps.build-info.outputs.build_id || 'En cours...' }}
+            
+            ### 📝 Comment télécharger
+            
+            1. Cliquez sur le lien ci-dessus
+            2. Attendez que le build soit terminé (statut "Finished")
+            3. Scannez le QR code ou cliquez sur "Download" pour obtenir l'APK
+            4. Installez l'APK sur votre appareil Android
             
             ---
             
-            _Build généré automatiquement par GitHub Actions_
+            _Build lancé automatiquement par GitHub Actions_
           draft: false
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -90,9 +119,9 @@ jobs:
         uses: peter-evans/commit-comment@v3
         with:
           body: |
-            ## ✅ Build Preview Réussi !
+            ## ✅ Build Preview Lancé !
             
-            📲 **Lien d'installation:** ${{ steps.build-info.outputs.expo_url }}
+            🚀 **Statut du build:** ${{ steps.build-info.outputs.expo_url }}
             
-            Le build est disponible pour installation directe.
+            Le build est en cours de génération sur EAS. Consultez la release GitHub pour obtenir le lien de téléchargement une fois le build terminé.
 
