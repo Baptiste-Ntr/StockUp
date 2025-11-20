@@ -7,7 +7,8 @@
     "android": "expo start -c --android",
     "ios": "expo start -c --ios",
     "web": "expo start -c --web",
-    "clean": "rm -rf .expo node_modules"
+    "clean": "rm -rf .expo node_modules",
+    "preview:android": "eas build -p android --profile preview"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -24,6 +25,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "expo": "^54.0.0",
+    "expo-dev-client": "~6.0.18",
     "expo-file-system": "^19.0.19",
     "expo-image-picker": "~17.0.8",
     "expo-linking": "~8.0.8",

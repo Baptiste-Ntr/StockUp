@@ -1,0 +1,98 @@
+name: 🚀 EAS Build Preview (Develop)
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'stockup/**'
+      - '.github/workflows/eas-build-preview.yml'
+  workflow_dispatch: # Permet de déclencher manuellement
+
+jobs:
+  build:
+    name: Build Android Preview APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Pour créer des releases
+      
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: stockup/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./stockup
+        run: npm ci
+
+      - name: 🏗️ Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🚀 Build Android APK
+        working-directory: ./stockup
+        run: eas build -p android --profile preview --non-interactive --no-wait
+        id: build
+
+      - name: 📋 Get Build Details
+        id: build-info
+        working-directory: ./stockup
+        run: |
+          # Récupère l'URL du dernier build
+          BUILD_URL=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl // "N/A"')
+          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
+          EXPO_URL="https://expo.dev/accounts/$(jq -r '.expo.owner' app.json)/projects/$(jq -r '.expo.slug' app.json)/builds/${BUILD_ID}"
+          
+          echo "build_url=${BUILD_URL}" >> $GITHUB_OUTPUT
+          echo "expo_url=${EXPO_URL}" >> $GITHUB_OUTPUT
+          echo "build_id=${BUILD_ID}" >> $GITHUB_OUTPUT
+
+      - name: 🏷️ Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: preview-${{ github.sha }}
+          name: "📱 Preview Build - ${{ github.event.head_commit.message }}"
+          body: |
+            ## 🎉 Nouveau build preview disponible !
+            
+            **Branche:** `develop`
+            **Commit:** ${{ github.sha }}
+            **Message:** ${{ github.event.head_commit.message }}
+            
+            ### 📲 Installation
+            
+            Scannez le QR code ou ouvrez ce lien sur votre appareil Android :
+            
+            🔗 **[Télécharger l'APK](${{ steps.build-info.outputs.expo_url }})**
+            
+            ### ℹ️ Informations du build
+            
+            - **Build ID:** `${{ steps.build-info.outputs.build_id }}`
+            - **Plateforme:** Android (APK)
+            - **Profile:** preview
+            
+            ---
+            
+            _Build généré automatiquement par GitHub Actions_
+          draft: false
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 💬 Comment on Commit
+        uses: peter-evans/commit-comment@v3
+        with:
+          body: |
+            ## ✅ Build Preview Réussi !
+            
+            📲 **Lien d'installation:** ${{ steps.build-info.outputs.expo_url }}
+            
+            Le build est disponible pour installation directe.
+

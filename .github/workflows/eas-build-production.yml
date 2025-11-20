@@ -1,0 +1,92 @@
+name: 🏭 EAS Build Production (Main)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'stockup/**'
+      - '.github/workflows/eas-build-production.yml'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+
+jobs:
+  build:
+    name: Build Production APK/AAB
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: stockup/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./stockup
+        run: npm ci
+
+      - name: 🏗️ Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🚀 Build Production
+        working-directory: ./stockup
+        run: eas build -p android --profile production --non-interactive --no-wait
+
+      - name: 📋 Get Build Details
+        id: build-info
+        working-directory: ./stockup
+        run: |
+          BUILD_ID=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].id')
+          EXPO_URL="https://expo.dev/accounts/$(jq -r '.expo.owner' app.json)/projects/$(jq -r '.expo.slug' app.json)/builds/${BUILD_ID}"
+          
+          echo "expo_url=${EXPO_URL}" >> $GITHUB_OUTPUT
+          echo "build_id=${BUILD_ID}" >> $GITHUB_OUTPUT
+
+      - name: 🏷️ Create Production Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: "🚀 Production Release v${{ github.run_number }}"
+          body: |
+            ## 🎊 Build de Production
+            
+            **Version:** v${{ github.run_number }}
+            **Branche:** `main`
+            **Commit:** ${{ github.sha }}
+            
+            ### 📲 Accès au build
+            
+            🔗 **[Voir le build sur Expo](${{ steps.build-info.outputs.expo_url }})**
+            
+            ### ℹ️ Informations
+            
+            - **Build ID:** `${{ steps.build-info.outputs.build_id }}`
+            - **Plateforme:** Android
+            - **Profile:** production
+            
+            ---
+            
+            _Build de production généré automatiquement_
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
