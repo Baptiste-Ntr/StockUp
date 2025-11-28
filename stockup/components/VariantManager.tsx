@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity, Alert, Switch } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -115,6 +115,22 @@ export function VariantManager({ variants, onChange }: VariantManagerProps) {
                   </TouchableOpacity>
                 </View>
               </View>
+            </View>
+
+            {/* Option stock négatif (prévente) */}
+            <View className="flex-row items-center justify-between bg-muted/50 rounded-lg p-3">
+              <View className="flex-1 mr-3">
+                <Text className="text-sm font-medium">Autoriser stock négatif</Text>
+                <Text className="text-xs text-muted-foreground mt-0.5">
+                  Permet les préventes pour cette variante
+                </Text>
+              </View>
+              <Switch
+                value={variant.allowNegativeStock || false}
+                onValueChange={(value) => handleUpdateVariant(variant.id, 'allowNegativeStock', value)}
+                trackColor={{ false: '#cbd5e1', true: '#3B82F6' }}
+                thumbColor="#ffffff"
+              />
             </View>
           </View>
         </View>

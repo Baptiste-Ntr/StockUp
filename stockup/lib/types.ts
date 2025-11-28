@@ -20,6 +20,7 @@ export interface ProductVariant {
   name: string; // ex: "Small, Red" ou "Adulte M"
   price: number;
   stock: number;
+  allowNegativeStock?: boolean; // Option pour autoriser le stock négatif (prévente)
 }
 
 export interface Product {
@@ -47,6 +48,7 @@ export interface Sale {
 
 export interface AppSettings {
   lowStockThreshold: number;
+  allowNegativeStockGlobal?: boolean; // Option globale pour autoriser le stock négatif
 }
 
 // Types pour les filtres et tris

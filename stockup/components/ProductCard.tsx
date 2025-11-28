@@ -3,9 +3,9 @@ import { useRouter } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
-import { EditIcon, TrashIcon, PackageIcon } from 'lucide-react-native';
+import { EditIcon, TrashIcon, PackageIcon, AlertTriangleIcon } from 'lucide-react-native';
 import type { Product, Category } from '@/lib/types';
-import { formatPrice, getStockStatus } from '@/lib/utils';
+import { formatPrice, getStockStatus, calculateStockInfo } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -17,18 +17,19 @@ interface ProductCardProps {
 export function ProductCard({ product, category, lowStockThreshold, onDelete }: ProductCardProps) {
   const router = useRouter();
 
-  // Calculer le stock total et vérifier si une variante est en stock bas
-  const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
-  const totalStockStatus = getStockStatus(totalStock, lowStockThreshold);
+  // Calculer le stock de manière intelligente
+  const stockInfo = calculateStockInfo(product.variants);
+  const totalStockStatus = getStockStatus(stockInfo.available, lowStockThreshold);
   
   // Vérifier si au moins une variante est en stock bas
   const hasLowStockVariant = product.variants.some(v => {
+    if (v.stock < 0) return false; // Ignorer les stocks négatifs pour l'alerte
     const variantStatus = getStockStatus(v.stock, lowStockThreshold);
     return variantStatus === 'low' || variantStatus === 'out';
   });
   
   // Le statut affiché est le pire des deux
-  const stockStatus = totalStockStatus === 'out' || hasLowStockVariant && totalStock === 0
+  const stockStatus = totalStockStatus === 'out' || hasLowStockVariant && stockInfo.available === 0
     ? 'out'
     : totalStockStatus === 'low' || hasLowStockVariant
     ? 'low'
@@ -114,9 +115,14 @@ export function ProductCard({ product, category, lowStockThreshold, onDelete }: 
             <Text className="text-xs text-muted-foreground">
               {product.variants.length} variante{product.variants.length > 1 ? 's' : ''}
             </Text>
-            <Text className="text-xs text-muted-foreground" >
-              Stock: {totalStock}
-            </Text>
+            <View className="flex-row items-center">
+              <Text className="text-xs text-muted-foreground">
+                Stock: {stockInfo.displayText}
+              </Text>
+              {stockInfo.hasNegative && (
+                <Icon as={AlertTriangleIcon} size={12} className="ml-1 text-orange-500" />
+              )}
+            </View>
             <Text className="text-xs text-muted-foreground">Valeur: {formatPrice(totalValue)}</Text>
           </View>
         </View>

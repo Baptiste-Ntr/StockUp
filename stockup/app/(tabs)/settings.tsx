@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { View, ScrollView, TouchableOpacity, Image, Alert, Share } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Image, Alert, Share, Switch } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
@@ -239,7 +239,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
 
           {/* Seuil stock bas */}
-          <View className="bg-card rounded-lg p-4 border border-border">
+          <View className="bg-card rounded-lg p-4 mb-3 border border-border">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="font-medium">Seuil d'alerte stock bas</Text>
               {!isEditingThreshold && (
@@ -282,6 +282,24 @@ export default function SettingsScreen() {
                 </Text>
               </View>
             )}
+          </View>
+
+          {/* Stock négatif global */}
+          <View className="bg-card rounded-lg p-4 border border-border">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1 mr-3">
+                <Text className="font-medium">Autoriser stock négatif (global)</Text>
+                <Text className="text-xs text-muted-foreground mt-1">
+                  Permet les préventes pour tous les produits qui n'ont pas d'option spécifique
+                </Text>
+              </View>
+              <Switch
+                value={settings.allowNegativeStockGlobal || false}
+                onValueChange={(value) => updateSettings({ allowNegativeStockGlobal: value })}
+                trackColor={{ false: '#cbd5e1', true: '#3B82F6' }}
+                thumbColor="#ffffff"
+              />
+            </View>
           </View>
         </View>
 

@@ -7,14 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 import { SearchIcon, PlusIcon, MinusIcon, CheckIcon, PackageIcon } from 'lucide-react-native';
-import { useProducts, useSales } from '@/lib/hooks';
-import { generateId, formatPrice } from '@/lib/utils';
+import { useProducts, useSales, useSettings } from '@/lib/hooks';
+import { generateId, formatPrice, calculateStockInfo } from '@/lib/utils';
 import type { Sale, Product, ProductVariant } from '@/lib/types';
 
 export default function AddSaleScreen() {
   const router = useRouter();
   const { products, updateProduct } = useProducts();
   const { addSale } = useSales();
+  const { settings } = useSettings();
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
@@ -63,15 +64,25 @@ export default function AddSaleScreen() {
     setIsVariantPickerOpen(false);
   };
 
+  // Vérifier si le stock négatif est autorisé
+  const isNegativeStockAllowed = (variant: ProductVariant) => {
+    // Priorité : option spécifique à la variante, sinon option globale
+    if (variant.allowNegativeStock !== undefined) {
+      return variant.allowNegativeStock;
+    }
+    return settings.allowNegativeStockGlobal || false;
+  };
+
   // Modifier la quantité
   const handleQuantityChange = (increment: boolean) => {
     if (!selectedVariant) return;
     
     if (increment) {
-      if (quantity < selectedVariant.stock) {
-        setQuantity(quantity + 1);
-      } else {
+      const allowNegative = isNegativeStockAllowed(selectedVariant);
+      if (!allowNegative && quantity >= selectedVariant.stock) {
         Alert.alert('Stock insuffisant', `Seulement ${selectedVariant.stock} disponible(s) en stock.`);
+      } else {
+        setQuantity(quantity + 1);
       }
     } else {
       if (quantity > 1) {
@@ -93,12 +104,36 @@ export default function AddSaleScreen() {
       return;
     }
 
-    if (quantity > selectedVariant.stock) {
+    // Vérifier le stock seulement si le stock négatif n'est pas autorisé
+    const allowNegative = isNegativeStockAllowed(selectedVariant);
+    if (!allowNegative && quantity > selectedVariant.stock) {
       Alert.alert('Stock insuffisant', `Seulement ${selectedVariant.stock} disponible(s) en stock.`);
       return;
     }
 
+    // Avertir si le stock devient négatif
+    if (allowNegative && quantity > selectedVariant.stock) {
+      const newStock = selectedVariant.stock - quantity;
+      Alert.alert(
+        'Prévente',
+        `Cette vente va créer un stock négatif de ${newStock} unités. Voulez-vous continuer ?`,
+        [
+          { text: 'Annuler', style: 'cancel', onPress: () => setIsSubmitting(false) },
+          { text: 'Confirmer', onPress: () => executeSale() },
+        ]
+      );
+      return;
+    }
+
     setIsSubmitting(true);
+    await executeSale();
+  };
+
+  const executeSale = async () => {
+    if (!selectedProduct || !selectedVariant) return;
+    
+    setIsSubmitting(true);
+    const price = parseFloat(salePrice);
 
     try {
       // Créer la vente
@@ -179,6 +214,11 @@ export default function AddSaleScreen() {
                 <Text className="text-sm font-medium">Stock disponible</Text>
                 <Text className="text-lg font-bold">{selectedVariant.stock}</Text>
               </View>
+              {isNegativeStockAllowed(selectedVariant) && (
+                <Text className="text-xs text-primary mt-2">
+                  ✓ Stock négatif autorisé (prévente possible)
+                </Text>
+              )}
             </View>
 
             {/* Quantité */}
@@ -198,8 +238,7 @@ export default function AddSaleScreen() {
                 
                 <TouchableOpacity
                   onPress={() => handleQuantityChange(true)}
-                  disabled={quantity >= selectedVariant.stock}
-                  className={`bg-muted p-4 rounded-lg ${quantity >= selectedVariant.stock ? 'opacity-50' : ''}`}>
+                  className="bg-muted p-4 rounded-lg">
                   <Icon as={PlusIcon} size={24} />
                 </TouchableOpacity>
               </View>
@@ -283,21 +322,22 @@ export default function AddSaleScreen() {
                 </View>
               ) : (
                 filteredProducts.map(product => {
-                  const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
+                  const stockInfo = calculateStockInfo(product.variants);
+                  const isOutOfStock = stockInfo.available === 0 && !stockInfo.hasNegative;
                   return (
                     <TouchableOpacity
                       key={product.id}
                       onPress={() => handleSelectProduct(product)}
-                      disabled={totalStock === 0}
-                      className={`py-4 border-b border-border ${totalStock === 0 ? 'opacity-50' : ''}`}>
+                      disabled={isOutOfStock}
+                      className={`py-4 border-b border-border ${isOutOfStock ? 'opacity-50' : ''}`}>
                       <View className="flex-row items-center justify-between">
                         <View className="flex-1">
                           <Text className="font-semibold">{product.name}</Text>
                           <Text className="text-sm text-muted-foreground mt-1">
-                            {product.variants.length} variante{product.variants.length > 1 ? 's' : ''} • Stock: {totalStock}
+                            {product.variants.length} variante{product.variants.length > 1 ? 's' : ''} • Stock: {stockInfo.displayText}
                           </Text>
                         </View>
-                        {totalStock === 0 && (
+                        {isOutOfStock && (
                           <Text className="text-sm text-destructive font-medium ml-2">Rupture</Text>
                         )}
                       </View>

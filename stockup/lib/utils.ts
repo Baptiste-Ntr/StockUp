@@ -55,6 +55,47 @@ export function getStockStatus(stock: number, threshold: number): 'ok' | 'low' |
   return 'ok';
 }
 
+// Calculer le stock de manière intelligente (sépare positif et négatif)
+export interface StockInfo {
+  total: number; // Total brut (peut être trompeur si mélange de positif et négatif)
+  available: number; // Stock disponible (uniquement positif)
+  presold: number; // Stock en prévente (uniquement négatif, valeur absolue)
+  hasNegative: boolean; // Indique s'il y a du stock négatif
+  displayText: string; // Texte formaté pour affichage
+}
+
+export function calculateStockInfo(variants: { stock: number }[]): StockInfo {
+  let available = 0;
+  let presold = 0;
+  let total = 0;
+
+  variants.forEach(v => {
+    total += v.stock;
+    if (v.stock > 0) {
+      available += v.stock;
+    } else if (v.stock < 0) {
+      presold += Math.abs(v.stock);
+    }
+  });
+
+  const hasNegative = presold > 0;
+  
+  let displayText = '';
+  if (hasNegative) {
+    displayText = `${available} dispo, ${presold} prévente`;
+  } else {
+    displayText = `${available}`;
+  }
+
+  return {
+    total,
+    available,
+    presold,
+    hasNegative,
+    displayText,
+  };
+}
+
 // Couleurs prédéfinies pour les catégories
 export const CATEGORY_COLORS = [
   '#3B82F6', // blue

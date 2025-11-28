@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Icon } from '@/components/ui/icon';
-import { LayoutDashboardIcon, PackageIcon, ReceiptIcon, SettingsIcon } from 'lucide-react-native';
+import { LayoutDashboardIcon, PackageIcon, ReceiptIcon, BarChart3Icon, SettingsIcon } from 'lucide-react-native';
 
 export default function TabsLayout() {
   return (
@@ -8,7 +8,7 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: '#FFF',
+        tabBarInactiveTintColor: '#9CA3AF', // Gris qui fonctionne sur fond clair et sombre
         tabBarStyle: {
           paddingTop: 8,
           paddingBottom: 28,
@@ -43,6 +43,15 @@ export default function TabsLayout() {
           title: 'Ventes',
           tabBarIcon: ({ color, size }) => (
             <Icon as={ReceiptIcon} size={size} style={{ color }} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          title: 'Analytics',
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={BarChart3Icon} size={size} style={{ color }} />
           ),
         }}
       />

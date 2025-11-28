@@ -1,15 +1,16 @@
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { PackageIcon } from 'lucide-react-native';
+import { PackageIcon, TrashIcon } from 'lucide-react-native';
 import type { Sale } from '@/lib/types';
 import { formatPrice, formatRelativeTime } from '@/lib/utils';
 
 interface SaleItemProps {
   sale: Sale;
+  onDelete?: () => void;
 }
 
-export function SaleItem({ sale }: SaleItemProps) {
+export function SaleItem({ sale, onDelete }: SaleItemProps) {
   return (
     <View className="flex-row items-center py-3">
       {/* Icône */}
@@ -36,6 +37,16 @@ export function SaleItem({ sale }: SaleItemProps) {
           {formatRelativeTime(sale.timestamp)}
         </Text>
       </View>
+
+      {/* Bouton de suppression */}
+      {onDelete && (
+        <TouchableOpacity
+          onPress={onDelete}
+          className="ml-3 p-2 rounded-lg bg-destructive/10"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Icon as={TrashIcon} size={18} className="text-destructive" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

@@ -1,17 +1,19 @@
 import { useState, useMemo, useCallback } from 'react';
-import { View, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { View, ScrollView, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Input } from '@/components/ui/input';
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 import { SearchIcon, CalendarIcon } from 'lucide-react-native';
-import { useSales } from '@/lib/hooks';
+import { useSales, useProducts } from '@/lib/hooks';
 import { SaleItem } from '@/components/SaleItem';
 import { formatPrice, formatDate } from '@/lib/utils';
+import type { Sale } from '@/lib/types';
 
 export default function SalesScreen() {
-  const { sales, reload: reloadSales } = useSales();
+  const { sales, deleteSale, reload: reloadSales } = useSales();
+  const { products, updateProduct } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState<'all' | 'today' | 'week' | 'month'>('all');
 
@@ -21,6 +23,43 @@ export default function SalesScreen() {
       reloadSales();
     }, [reloadSales])
   );
+
+  // Gérer la suppression d'une vente
+  const handleDeleteSale = useCallback(async (sale: Sale) => {
+    Alert.alert(
+      'Supprimer la vente',
+      `Êtes-vous sûr de vouloir supprimer cette vente de ${sale.quantity} ${sale.productName} - ${sale.variantName} ?\n\nLe stock sera restauré.`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Restaurer le stock du produit
+              const product = products.find(p => p.id === sale.productId);
+              if (product) {
+                const updatedVariants = product.variants.map(v =>
+                  v.id === sale.variantId
+                    ? { ...v, stock: v.stock + sale.quantity }
+                    : v
+                );
+                await updateProduct(product.id, { variants: updatedVariants });
+              }
+
+              // Supprimer la vente
+              await deleteSale(sale.id);
+              
+              Alert.alert('Vente supprimée', 'La vente a été supprimée et le stock a été restauré.');
+            } catch (error) {
+              console.error('Error deleting sale:', error);
+              Alert.alert('Erreur', 'Impossible de supprimer la vente.');
+            }
+          },
+        },
+      ]
+    );
+  }, [products, updateProduct, deleteSale]);
 
   // Filtrer les ventes
   const filteredSales = useMemo(() => {
@@ -177,7 +216,7 @@ export default function SalesScreen() {
               <View className="bg-card px-4">
                 {group.sales.map((sale, index) => (
                   <View key={sale.id}>
-                    <SaleItem sale={sale} />
+                    <SaleItem sale={sale} onDelete={() => handleDeleteSale(sale)} />
                     {index < group.sales.length - 1 && <Separator />}
                   </View>
                 ))}

@@ -10,7 +10,7 @@ import { SearchIcon, PlusIcon, FilterIcon, AlertTriangleIcon } from 'lucide-reac
 import { useProducts, useCategories, useSettings } from '@/lib/hooks';
 import { ProductCard } from '@/components/ProductCard';
 import type { StockStatus, ProductSortBy } from '@/lib/types';
-import { getStockStatus } from '@/lib/utils';
+import { getStockStatus, calculateStockInfo } from '@/lib/utils';
 
 export default function InventoryScreen() {
   const router = useRouter();
@@ -52,11 +52,12 @@ export default function InventoryScreen() {
     // Filtrer par statut de stock
     if (selectedStockStatus !== 'all') {
       filtered = filtered.filter(p => {
-        const totalStock = p.variants.reduce((sum, v) => sum + v.stock, 0);
-        const totalStatus = getStockStatus(totalStock, settings.lowStockThreshold);
+        const stockInfo = calculateStockInfo(p.variants);
+        const totalStatus = getStockStatus(stockInfo.available, settings.lowStockThreshold);
         
-        // Vérifier si au moins une variante correspond au statut recherché
+        // Vérifier si au moins une variante correspond au statut recherché (ignorer stocks négatifs)
         const hasVariantWithStatus = p.variants.some(v => {
+          if (v.stock < 0) return false;
           const variantStatus = getStockStatus(v.stock, settings.lowStockThreshold);
           return variantStatus === selectedStockStatus;
         });
@@ -77,15 +78,15 @@ export default function InventoryScreen() {
         break;
       case 'stock-low':
         sorted.sort((a, b) => {
-          const stockA = a.variants.reduce((sum, v) => sum + v.stock, 0);
-          const stockB = b.variants.reduce((sum, v) => sum + v.stock, 0);
+          const stockA = calculateStockInfo(a.variants).available;
+          const stockB = calculateStockInfo(b.variants).available;
           return stockA - stockB;
         });
         break;
       case 'stock-high':
         sorted.sort((a, b) => {
-          const stockA = a.variants.reduce((sum, v) => sum + v.stock, 0);
-          const stockB = b.variants.reduce((sum, v) => sum + v.stock, 0);
+          const stockA = calculateStockInfo(a.variants).available;
+          const stockB = calculateStockInfo(b.variants).available;
           return stockB - stockA;
         });
         break;
@@ -97,11 +98,12 @@ export default function InventoryScreen() {
   // Compter les produits en stock bas (si une variante ou le total est en stock bas)
   const lowStockCount = useMemo(() => {
     return products.filter(p => {
-      const totalStock = p.variants.reduce((sum, v) => sum + v.stock, 0);
-      const totalStatus = getStockStatus(totalStock, settings.lowStockThreshold);
+      const stockInfo = calculateStockInfo(p.variants);
+      const totalStatus = getStockStatus(stockInfo.available, settings.lowStockThreshold);
       
-      // Vérifier si au moins une variante est en stock bas
+      // Vérifier si au moins une variante est en stock bas (ignorer stocks négatifs)
       const hasLowStockVariant = p.variants.some(v => {
+        if (v.stock < 0) return false;
         const variantStatus = getStockStatus(v.stock, settings.lowStockThreshold);
         return variantStatus === 'low' || variantStatus === 'out';
       });
