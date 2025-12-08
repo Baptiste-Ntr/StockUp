@@ -16,28 +16,6 @@ import { useUser, useSettings } from '@/lib/hooks';
 import { exportData, resetAllData } from '@/lib/storage';
 import * as Sentry from '@sentry/react-native';
 
-let sentryInitialized = false;
-const initSentry = () => {
-  if (sentryInitialized) return;
-  sentryInitialized = true;
-  Sentry.init({
-    dsn: 'https://f48af08d61a97fce661c74e34fefe5d1@o4510501265408000.ingest.de.sentry.io/4510501267898448',
-    integrations: [
-      Sentry.feedbackIntegration({
-        styles: {
-          submitButton: {
-            backgroundColor: '#6a1b9a',
-          },
-        },
-        namePlaceholder: 'Fullname',
-        isNameRequired: true,
-      }),
-    ],
-  });
-};
-
-initSentry();
-
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, updateUser, reload: reloadUser } = useUser();
@@ -158,15 +136,11 @@ export default function SettingsScreen() {
 
   const handleOpenFeedback = useCallback(async () => {
     try {
-      const sentryAny = Sentry as unknown as { showFeedback?: () => Promise<void> | void };
-      if (sentryAny.showFeedback) {
-        await sentryAny.showFeedback();
-      } else {
-        Alert.alert('Feedback', 'Le widget Sentry n’est pas disponible.');
-      }
+      Sentry.showFeedbackWidget()
     } catch (error) {
       console.error('Sentry feedback error', error);
       Alert.alert('Feedback', 'Impossible d’ouvrir le formulaire.');
+      Sentry.captureException(error)
     }
   }, []);
 
