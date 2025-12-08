@@ -49,6 +49,7 @@ export interface Sale {
 export interface AppSettings {
   lowStockThreshold: number;
   allowNegativeStockGlobal?: boolean; // Option globale pour autoriser le stock négatif
+  theme?: 'light' | 'dark'; // Préférence de thème
 }
 
 // Types pour les filtres et tris

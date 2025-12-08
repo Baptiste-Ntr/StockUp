@@ -10,7 +10,7 @@ import { SearchIcon, PlusIcon, FilterIcon, AlertTriangleIcon } from 'lucide-reac
 import { useProducts, useCategories, useSettings } from '@/lib/hooks';
 import { ProductCard } from '@/components/ProductCard';
 import type { StockStatus, ProductSortBy } from '@/lib/types';
-import { getStockStatus, calculateStockInfo } from '@/lib/utils';
+import { getStockStatus, calculateStockInfo, formatPrice } from '@/lib/utils';
 
 export default function InventoryScreen() {
   const router = useRouter();
@@ -132,38 +132,50 @@ export default function InventoryScreen() {
   return (
     <View className="flex-1 bg-background">
       {/* Header */}
-      <View className="px-4 pt-12 pb-4 border-b border-border">
-        <Text className="text-3xl font-bold mb-4">Inventaire</Text>
+      <View className="border-b border-border px-4 pb-4 pt-12">
+        <View className="flex-row items-center justify-between">
+          <Text className="mb-4 text-3xl font-bold">Inventaire</Text>
+          <Text className="mb-4 text-2xl font-extrabold">
+            {formatPrice(
+              products.reduce(
+                (total, product) =>
+                  total +
+                  product.variants.reduce((sum, variant) => sum + variant.price * variant.stock, 0),
+                0
+              )
+            )}
+          </Text>
+        </View>
 
         {/* Barre de recherche */}
-        <View className="flex-row items-center gap-2 mb-4">
-          <View className="flex-1 flex-row items-center bg-muted rounded-lg px-3 py-2">
-            <Icon as={SearchIcon} size={20} className="text-muted-foreground mr-2" />
+        <View className="mb-4 flex-row items-center gap-2">
+          <View className="flex-1 flex-row items-center rounded-lg bg-muted px-3 py-2">
+            <Icon as={SearchIcon} size={20} className="mr-2 text-muted-foreground" />
             <Input
               placeholder="Rechercher un produit..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              className="flex-1 bg-transparent border-0"
+              className="flex-1 border-0 bg-transparent"
             />
           </View>
         </View>
 
         {/* Bouton ajouter */}
-        <Button
-          onPress={() => router.push('/add-product')}
-          className="w-full mb-4">
+        <Button onPress={() => router.push('/add-product')} className="mb-4 w-full">
           <Icon as={PlusIcon} className="text-primary-foreground" />
-          <Text className="text-primary-foreground font-semibold ml-2">
-            Ajouter un produit
-          </Text>
+          <Text className="ml-2 font-semibold text-primary-foreground">Ajouter un produit</Text>
         </Button>
 
         {/* Alerte stock bas */}
         {lowStockCount > 0 && (
           <TouchableOpacity
             onPress={() => setSelectedStockStatus('low')}
-            className="bg-orange-50 dark:bg-orange-950 border border-orange-300 dark:border-orange-700 rounded-lg p-3 flex-row items-center">
-            <Icon as={AlertTriangleIcon} size={20} className="text-orange-600 dark:text-orange-400 mr-3" />
+            className="flex-row items-center rounded-lg border border-orange-300 bg-orange-50 p-3 dark:border-orange-700 dark:bg-orange-950">
+            <Icon
+              as={AlertTriangleIcon}
+              size={20}
+              className="mr-3 text-orange-600 dark:text-orange-400"
+            />
             <View className="flex-1">
               <Text className="text-sm font-semibold text-orange-900 dark:text-orange-100">
                 {lowStockCount} produit{lowStockCount > 1 ? 's' : ''} en stock bas
@@ -179,24 +191,26 @@ export default function InventoryScreen() {
       {/* Filtres */}
       <View className="border-b border-border">
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4 py-3">
-          <View className="flex-row gap-2 items-center">
+          <View className="flex-row items-center gap-2">
             {/* Filtre catégories */}
             <TouchableOpacity
               onPress={() => setSelectedCategory('all')}
-              className={`px-4 py-2 rounded-full ${selectedCategory === 'all' ? 'bg-primary' : 'bg-muted'}`}>
-              <Text className={`text-sm ${selectedCategory === 'all' ? 'text-primary-foreground font-semibold' : 'text-foreground'}`}>
+              className={`rounded-full px-4 py-2 ${selectedCategory === 'all' ? 'bg-primary' : 'bg-muted'}`}>
+              <Text
+                className={`text-sm ${selectedCategory === 'all' ? 'font-semibold text-primary-foreground' : 'text-foreground'}`}>
                 Toutes
               </Text>
             </TouchableOpacity>
 
-            {categories.map(cat => (
+            {categories.map((cat) => (
               <TouchableOpacity
                 key={cat.id}
                 onPress={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full ${selectedCategory === cat.id ? 'bg-primary' : 'bg-muted'}`}>
+                className={`rounded-full px-4 py-2 ${selectedCategory === cat.id ? 'bg-primary' : 'bg-muted'}`}>
                 <View className="flex-row items-center gap-2">
-                  <View className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
-                  <Text className={`text-sm ${selectedCategory === cat.id ? 'text-primary-foreground font-semibold' : 'text-foreground'}`}>
+                  <View className="h-2 w-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                  <Text
+                    className={`text-sm ${selectedCategory === cat.id ? 'font-semibold text-primary-foreground' : 'text-foreground'}`}>
                     {cat.name}
                   </Text>
                 </View>
@@ -204,21 +218,23 @@ export default function InventoryScreen() {
             ))}
 
             {/* Séparateur */}
-            <View className="w-px h-6 bg-border mx-1" />
-            
+            <View className="mx-1 h-6 w-px bg-border" />
+
             {/* Filtre stock */}
             <TouchableOpacity
               onPress={() => setSelectedStockStatus(selectedStockStatus === 'low' ? 'all' : 'low')}
-              className={`px-4 py-2 rounded-full ${selectedStockStatus === 'low' ? 'bg-orange-500' : 'bg-muted'}`}>
-              <Text className={`text-sm ${selectedStockStatus === 'low' ? 'text-white font-semibold' : 'text-foreground'}`}>
+              className={`rounded-full px-4 py-2 ${selectedStockStatus === 'low' ? 'bg-orange-500' : 'bg-muted'}`}>
+              <Text
+                className={`text-sm ${selectedStockStatus === 'low' ? 'font-semibold text-white' : 'text-foreground'}`}>
                 Stock bas
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setSelectedStockStatus(selectedStockStatus === 'out' ? 'all' : 'out')}
-              className={`px-4 py-2 rounded-full ${selectedStockStatus === 'out' ? 'bg-destructive' : 'bg-muted'}`}>
-              <Text className={`text-sm ${selectedStockStatus === 'out' ? 'text-white font-semibold' : 'text-foreground'}`}>
+              className={`rounded-full px-4 py-2 ${selectedStockStatus === 'out' ? 'bg-destructive' : 'bg-muted'}`}>
+              <Text
+                className={`text-sm ${selectedStockStatus === 'out' ? 'font-semibold text-white' : 'text-foreground'}`}>
                 Rupture
               </Text>
             </TouchableOpacity>
@@ -230,12 +246,10 @@ export default function InventoryScreen() {
       <View className="flex-1">
         {filteredProducts.length === 0 ? (
           <View className="flex-1 items-center justify-center px-8">
-            <Text className="text-lg text-muted-foreground text-center mb-2">
-              {products.length === 0 
-                ? 'Aucun produit dans l\'inventaire'
-                : 'Aucun produit trouvé'}
+            <Text className="mb-2 text-center text-lg text-muted-foreground">
+              {products.length === 0 ? "Aucun produit dans l'inventaire" : 'Aucun produit trouvé'}
             </Text>
-            <Text className="text-sm text-muted-foreground text-center">
+            <Text className="text-center text-sm text-muted-foreground">
               {products.length === 0
                 ? 'Commencez par ajouter votre premier produit'
                 : 'Essayez de modifier vos filtres'}
@@ -248,7 +262,7 @@ export default function InventoryScreen() {
             renderItem={({ item }) => (
               <ProductCard
                 product={item}
-                category={categories.find(c => c.id === item.categoryId)}
+                category={categories.find((c) => c.id === item.categoryId)}
                 lowStockThreshold={settings.lowStockThreshold}
                 onDelete={() => handleDeleteProduct(item.id, item.name)}
               />

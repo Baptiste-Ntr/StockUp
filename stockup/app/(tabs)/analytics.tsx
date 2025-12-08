@@ -205,13 +205,13 @@ export default function AnalyticsScreen() {
           {/* Argent dormant - Carte principale */}
           <View className="bg-gradient-to-br from-primary to-primary/80 rounded-xl p-6 mb-4 border border-primary">
             <View className="flex-row items-center mb-2">
-              <Icon as={DollarSignIcon} size={24} className="text-primary-foreground mr-2" />
-              <Text className="text-primary-foreground text-sm font-medium">Argent dormant</Text>
+              <Icon as={DollarSignIcon} size={24} className="text-primary mr-2" />
+              <Text className="text-primary text-sm font-medium">Argent dormant</Text>
             </View>
-            <Text className="text-4xl font-bold text-primary-foreground mb-1">
+            <Text className="text-4xl font-bold text-primary mb-1">
               {formatPrice(inventoryValue)}
             </Text>
-            <Text className="text-primary-foreground/80 text-xs">
+            <Text className="text-primary/80 text-xs">
               Valeur totale des stocks invendus
             </Text>
           </View>

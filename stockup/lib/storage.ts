@@ -186,12 +186,15 @@ export async function deleteSale(id: string): Promise<void> {
 
 const DEFAULT_SETTINGS: AppSettings = {
   lowStockThreshold: 10,
+  allowNegativeStockGlobal: false,
+  theme: 'light',
 };
 
 export async function getSettings(): Promise<AppSettings> {
   try {
     const data = await AsyncStorage.getItem(KEYS.SETTINGS);
-    return data ? JSON.parse(data) : DEFAULT_SETTINGS;
+    const parsed = data ? JSON.parse(data) : {};
+    return { ...DEFAULT_SETTINGS, ...parsed };
   } catch (error) {
     console.error('Error getting settings:', error);
     return DEFAULT_SETTINGS;

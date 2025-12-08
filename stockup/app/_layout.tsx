@@ -7,7 +7,7 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
-import { useUser } from '@/lib/hooks';
+import { useSettings, useUser } from '@/lib/hooks';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -15,13 +15,14 @@ export {
 } from 'expo-router';
 
 export default function RootLayout() {
-  const { colorScheme } = useColorScheme();
-  const { user, loading } = useUser();
+  const { colorScheme, setColorScheme } = useColorScheme();
+  const { user, loading: userLoading } = useUser();
+  const { settings, loading: settingsLoading } = useSettings();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return;
+    if (userLoading) return;
 
     const inOnboarding = segments[0] === '(onboarding)';
     const inTabs = segments[0] === '(tabs)';
@@ -40,15 +41,25 @@ export default function RootLayout() {
     if (user && !inTabs && !inOnboarding && segments[0] !== 'add-product' && segments[0] !== 'add-sale' && segments[0] !== 'manage-categories') {
       router.replace('/(tabs)');
     }
-  }, [user, loading, segments]);
+  }, [user, userLoading, segments]);
 
-  if (loading) {
+  useEffect(() => {
+    if (settingsLoading) return;
+    // Initialise le thème avec la préférence stockée uniquement si aucun thème n'est encore appliqué
+    if (!colorScheme && settings?.theme && setColorScheme) {
+      setColorScheme(settings.theme);
+    }
+  }, [settings?.theme, settingsLoading, setColorScheme, colorScheme]);
+
+  if (userLoading || settingsLoading) {
     return null;
   }
 
+  const effectiveTheme = colorScheme ?? settings?.theme ?? 'light';
+
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    <ThemeProvider value={NAV_THEME[effectiveTheme]}>
+      <StatusBar style={effectiveTheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,

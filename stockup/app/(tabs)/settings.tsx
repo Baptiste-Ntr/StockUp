@@ -3,6 +3,7 @@ import { View, ScrollView, TouchableOpacity, Image, Alert, Share, Switch } from 
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { useColorScheme } from 'nativewind';
 import { Text } from '@/components/ui/text';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { user, updateUser, reload: reloadUser } = useUser();
   const { settings, updateSettings, reload: reloadSettings } = useSettings();
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [firstName, setFirstName] = useState(user?.firstName || '');
@@ -28,6 +30,7 @@ export default function SettingsScreen() {
   const [threshold, setThreshold] = useState(settings.lowStockThreshold.toString());
 
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const currentTheme = colorScheme ?? settings.theme ?? 'light';
 
   // Recharger les données quand l'écran est focus
   useFocusEffect(
@@ -112,6 +115,14 @@ export default function SettingsScreen() {
       console.error('Error resetting data:', error);
       Alert.alert('Erreur', 'Impossible de réinitialiser les données.');
     }
+  };
+
+  const handleToggleTheme = (value: boolean) => {
+    const nextTheme = value ? 'dark' : 'light';
+    if (setColorScheme) {
+      setColorScheme(nextTheme);
+    }
+    updateSettings({ theme: nextTheme });
   };
 
   return (
@@ -284,6 +295,24 @@ export default function SettingsScreen() {
             )}
           </View>
 
+          {/* Thème */}
+          <View className="bg-card rounded-lg p-4 mb-3 border border-border">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1 mr-3">
+                <Text className="font-medium">Thème sombre</Text>
+                <Text className="text-xs text-muted-foreground mt-1">
+                  Basculez l'interface entre thème clair et sombre
+                </Text>
+              </View>
+              <Switch
+                value={currentTheme === 'dark'}
+                onValueChange={handleToggleTheme}
+                trackColor={{ false: '#cbd5e1', true: '#3B82F6' }}
+                thumbColor="#ffffff"
+              />
+            </View>
+          </View>
+
           {/* Stock négatif global */}
           <View className="bg-card rounded-lg p-4 border border-border">
             <View className="flex-row items-center justify-between">
@@ -333,7 +362,7 @@ export default function SettingsScreen() {
 
         {/* Version */}
         <View className="items-center py-6">
-          <Text className="text-sm text-muted-foreground">StockUp v1.0.0</Text>
+          <Text className="text-sm text-muted-foreground">StockUp Alpha v0.0.1</Text>
         </View>
       </View>
 

@@ -134,7 +134,11 @@ export function useSales() {
 
 // Hook pour les settings
 export function useSettings() {
-  const [settings, setSettings] = useState<AppSettings>({ lowStockThreshold: 10 });
+  const [settings, setSettings] = useState<AppSettings>({
+    lowStockThreshold: 10,
+    allowNegativeStockGlobal: false,
+    theme: 'light',
+  });
   const [loading, setLoading] = useState(true);
 
   const loadSettings = useCallback(async () => {
