@@ -8,13 +8,33 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import { useEffect } from 'react';
 import { useSettings, useUser } from '@/lib/hooks';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://f48af08d61a97fce661c74e34fefe5d1@o4510501265408000.ingest.de.sentry.io/4510501267898448',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
   const { user, loading: userLoading } = useUser();
   const { settings, loading: settingsLoading } = useSettings();
@@ -94,4 +114,4 @@ export default function RootLayout() {
       <PortalHost />
     </ThemeProvider>
   );
-}
+});

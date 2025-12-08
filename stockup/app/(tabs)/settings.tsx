@@ -11,9 +11,32 @@ import { Icon } from '@/components/ui/icon';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { CameraIcon, UserIcon, FolderIcon, TrashIcon, DownloadIcon, TagIcon } from 'lucide-react-native';
+import { CameraIcon, UserIcon, FolderIcon, TrashIcon, DownloadIcon, TagIcon, MessageCircleIcon } from 'lucide-react-native';
 import { useUser, useSettings } from '@/lib/hooks';
 import { exportData, resetAllData } from '@/lib/storage';
+import * as Sentry from '@sentry/react-native';
+
+let sentryInitialized = false;
+const initSentry = () => {
+  if (sentryInitialized) return;
+  sentryInitialized = true;
+  Sentry.init({
+    dsn: 'https://f48af08d61a97fce661c74e34fefe5d1@o4510501265408000.ingest.de.sentry.io/4510501267898448',
+    integrations: [
+      Sentry.feedbackIntegration({
+        styles: {
+          submitButton: {
+            backgroundColor: '#6a1b9a',
+          },
+        },
+        namePlaceholder: 'Fullname',
+        isNameRequired: true,
+      }),
+    ],
+  });
+};
+
+initSentry();
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -90,7 +113,15 @@ export default function SettingsScreen() {
     try {
       const data = await exportData();
       const fileName = `stockup-export-${Date.now()}.json`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      const fs = FileSystem as unknown as {
+        documentDirectory?: string | null;
+        cacheDirectory?: string | null;
+      };
+      const baseDir = fs.documentDirectory ?? fs.cacheDirectory;
+      if (!baseDir) {
+        throw new Error('Aucun répertoire disponible pour l’export.');
+      }
+      const fileUri = `${baseDir}${fileName}`;
       
       await FileSystem.writeAsStringAsync(fileUri, data);
       
@@ -125,47 +156,60 @@ export default function SettingsScreen() {
     updateSettings({ theme: nextTheme });
   };
 
+  const handleOpenFeedback = useCallback(async () => {
+    try {
+      const sentryAny = Sentry as unknown as { showFeedback?: () => Promise<void> | void };
+      if (sentryAny.showFeedback) {
+        await sentryAny.showFeedback();
+      } else {
+        Alert.alert('Feedback', 'Le widget Sentry n’est pas disponible.');
+      }
+    } catch (error) {
+      console.error('Sentry feedback error', error);
+      Alert.alert('Feedback', 'Impossible d’ouvrir le formulaire.');
+    }
+  }, []);
+
   return (
     <ScrollView className="flex-1 bg-background">
       {/* Header */}
-      <View className="px-4 pt-12 pb-6">
+      <View className="px-4 pb-6 pt-12">
         <Text className="text-3xl font-bold">Paramètres</Text>
       </View>
 
-      <View className="px-4 gap-6">
+      <View className="gap-6 px-4">
         {/* Section Profil */}
         <View>
-          <View className="flex-row items-center justify-between mb-4">
+          <View className="mb-4 flex-row items-center justify-between">
             <View className="flex-row items-center">
-              <Icon as={UserIcon} size={20} className="text-primary mr-2" />
+              <Icon as={UserIcon} size={20} className="mr-2 text-primary" />
               <Text className="text-xl font-bold">Profil</Text>
             </View>
             {!isEditingProfile && (
-              <TouchableOpacity onPress={() => {
-                setIsEditingProfile(true);
-                setFirstName(user?.firstName || '');
-                setLastName(user?.lastName || '');
-                setPhotoUri(user?.photoUri);
-              }}>
-                <Text className="text-primary font-semibold">Modifier</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setIsEditingProfile(true);
+                  setFirstName(user?.firstName || '');
+                  setLastName(user?.lastName || '');
+                  setPhotoUri(user?.photoUri);
+                }}>
+                <Text className="font-semibold text-primary">Modifier</Text>
               </TouchableOpacity>
             )}
           </View>
 
-          <View className="bg-card rounded-lg p-4 border border-border">
+          <View className="rounded-lg border border-border bg-card p-4">
             {isEditingProfile ? (
               <View className="gap-4">
                 {/* Photo */}
-                <View className="items-center mb-2">
-                  <TouchableOpacity
-                    onPress={pickImage}
-                    className="relative">
+                <View className="mb-2 items-center">
+                  <TouchableOpacity onPress={pickImage} className="relative">
                     {photoUri ? (
-                      <Avatar alt="Profile" className="w-24 h-24">
-                        <Image source={{ uri: photoUri }} className="w-full h-full" />
+                      <Avatar alt="Profile" className="h-24 w-24">
+                        <Image source={{ uri: photoUri }} className="h-full w-full" />
                       </Avatar>
                     ) : (
-                      <Avatar alt="Profile" className="w-24 h-24 bg-primary">
+                      <Avatar alt="Profile" className="h-24 w-24 bg-primary">
                         <Icon as={CameraIcon} size={32} className="text-primary-foreground" />
                       </Avatar>
                     )}
@@ -175,21 +219,13 @@ export default function SettingsScreen() {
                 {/* Prénom */}
                 <View className="gap-1">
                   <Text className="text-sm font-medium">Prénom</Text>
-                  <Input
-                    value={firstName}
-                    onChangeText={setFirstName}
-                    placeholder="Prénom"
-                  />
+                  <Input value={firstName} onChangeText={setFirstName} placeholder="Prénom" />
                 </View>
 
                 {/* Nom */}
                 <View className="gap-1">
                   <Text className="text-sm font-medium">Nom</Text>
-                  <Input
-                    value={lastName}
-                    onChangeText={setLastName}
-                    placeholder="Nom"
-                  />
+                  <Input value={lastName} onChangeText={setLastName} placeholder="Nom" />
                 </View>
 
                 {/* Boutons */}
@@ -200,9 +236,7 @@ export default function SettingsScreen() {
                     className="flex-1">
                     <Text>Annuler</Text>
                   </Button>
-                  <Button
-                    onPress={handleSaveProfile}
-                    className="flex-1">
+                  <Button onPress={handleSaveProfile} className="flex-1">
                     <Text className="text-primary-foreground">Enregistrer</Text>
                   </Button>
                 </View>
@@ -210,18 +244,23 @@ export default function SettingsScreen() {
             ) : (
               <View className="flex-row items-center">
                 {user?.photoUri ? (
-                  <Avatar alt={`${user.firstName} ${user.lastName}`} className="w-16 h-16 mr-4">
-                    <Image source={{ uri: user.photoUri }} className="w-full h-full" />
+                  <Avatar alt={`${user.firstName} ${user.lastName}`} className="mr-4 h-16 w-16">
+                    <Image source={{ uri: user.photoUri }} className="h-full w-full" />
                   </Avatar>
                 ) : (
-                  <Avatar alt={`${user?.firstName} ${user?.lastName}`} className="w-16 h-16 bg-primary mr-4">
-                    <Text className="text-primary-foreground text-2xl font-bold">
-                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  <Avatar
+                    alt={`${user?.firstName} ${user?.lastName}`}
+                    className="mr-4 h-16 w-16 bg-primary">
+                    <Text className="text-2xl font-bold text-primary-foreground">
+                      {user?.firstName?.[0]}
+                      {user?.lastName?.[0]}
                     </Text>
                   </Avatar>
                 )}
                 <View>
-                  <Text className="text-xl font-bold">{user?.firstName} {user?.lastName}</Text>
+                  <Text className="text-xl font-bold">
+                    {user?.firstName} {user?.lastName}
+                  </Text>
                   <Text className="text-sm text-muted-foreground">Gestionnaire</Text>
                 </View>
               </View>
@@ -233,36 +272,37 @@ export default function SettingsScreen() {
 
         {/* Section Gestion */}
         <View>
-          <View className="flex-row items-center mb-4">
-            <Icon as={FolderIcon} size={20} className="text-primary mr-2" />
+          <View className="mb-4 flex-row items-center">
+            <Icon as={FolderIcon} size={20} className="mr-2 text-primary" />
             <Text className="text-xl font-bold">Gestion</Text>
           </View>
 
           {/* Gérer les catégories */}
           <TouchableOpacity
             onPress={() => router.push('/manage-categories')}
-            className="bg-card rounded-lg p-4 mb-3 border border-border flex-row items-center justify-between">
-            <View className="flex-row items-center flex-1">
-              <Icon as={TagIcon} size={20} className="text-muted-foreground mr-3" />
+            className="mb-3 flex-row items-center justify-between rounded-lg border border-border bg-card p-4">
+            <View className="flex-1 flex-row items-center">
+              <Icon as={TagIcon} size={20} className="mr-3 text-muted-foreground" />
               <Text className="font-medium">Gérer les catégories</Text>
             </View>
             <Text className="text-muted-foreground">›</Text>
           </TouchableOpacity>
 
           {/* Seuil stock bas */}
-          <View className="bg-card rounded-lg p-4 mb-3 border border-border">
-            <View className="flex-row items-center justify-between mb-2">
+          <View className="mb-3 rounded-lg border border-border bg-card p-4">
+            <View className="mb-2 flex-row items-center justify-between">
               <Text className="font-medium">Seuil d'alerte stock bas</Text>
               {!isEditingThreshold && (
-                <TouchableOpacity onPress={() => {
-                  setIsEditingThreshold(true);
-                  setThreshold(settings.lowStockThreshold.toString());
-                }}>
-                  <Text className="text-primary font-semibold">Modifier</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsEditingThreshold(true);
+                    setThreshold(settings.lowStockThreshold.toString());
+                  }}>
+                  <Text className="font-semibold text-primary">Modifier</Text>
                 </TouchableOpacity>
               )}
             </View>
-            
+
             {isEditingThreshold ? (
               <View className="gap-3">
                 <Input
@@ -278,17 +318,17 @@ export default function SettingsScreen() {
                     className="flex-1">
                     <Text>Annuler</Text>
                   </Button>
-                  <Button
-                    onPress={handleSaveThreshold}
-                    className="flex-1">
+                  <Button onPress={handleSaveThreshold} className="flex-1">
                     <Text className="text-primary-foreground">Enregistrer</Text>
                   </Button>
                 </View>
               </View>
             ) : (
               <View>
-                <Text className="text-2xl font-bold text-primary">{settings.lowStockThreshold}</Text>
-                <Text className="text-xs text-muted-foreground mt-1">
+                <Text className="text-2xl font-bold text-primary">
+                  {settings.lowStockThreshold}
+                </Text>
+                <Text className="mt-1 text-xs text-muted-foreground">
                   Alerte affichée quand le stock atteint ou passe sous ce seuil
                 </Text>
               </View>
@@ -296,11 +336,11 @@ export default function SettingsScreen() {
           </View>
 
           {/* Thème */}
-          <View className="bg-card rounded-lg p-4 mb-3 border border-border">
+          <View className="mb-3 rounded-lg border border-border bg-card p-4">
             <View className="flex-row items-center justify-between">
-              <View className="flex-1 mr-3">
+              <View className="mr-3 flex-1">
                 <Text className="font-medium">Thème sombre</Text>
-                <Text className="text-xs text-muted-foreground mt-1">
+                <Text className="mt-1 text-xs text-muted-foreground">
                   Basculez l'interface entre thème clair et sombre
                 </Text>
               </View>
@@ -314,11 +354,11 @@ export default function SettingsScreen() {
           </View>
 
           {/* Stock négatif global */}
-          <View className="bg-card rounded-lg p-4 border border-border">
+          <View className="rounded-lg border border-border bg-card p-4">
             <View className="flex-row items-center justify-between">
-              <View className="flex-1 mr-3">
+              <View className="mr-3 flex-1">
                 <Text className="font-medium">Autoriser stock négatif (global)</Text>
-                <Text className="text-xs text-muted-foreground mt-1">
+                <Text className="mt-1 text-xs text-muted-foreground">
                   Permet les préventes pour tous les produits qui n'ont pas d'option spécifique
                 </Text>
               </View>
@@ -334,29 +374,32 @@ export default function SettingsScreen() {
 
         <Separator />
 
+        <View className="px-4 pb-8">
+          <Button variant="outline" onPress={handleOpenFeedback} className="w-full">
+            <Icon as={MessageCircleIcon} className="text-foreground" />
+            <Text className="ml-2">Donner votre avis</Text>
+          </Button>
+        </View>
+
+        <Separator />
+
         {/* Section Données */}
         <View>
-          <View className="flex-row items-center mb-4">
-            <Icon as={DownloadIcon} size={20} className="text-primary mr-2" />
+          <View className="mb-4 flex-row items-center">
+            <Icon as={DownloadIcon} size={20} className="mr-2 text-primary" />
             <Text className="text-xl font-bold">Données</Text>
           </View>
 
           {/* Exporter */}
-          <Button
-            variant="outline"
-            onPress={handleExportData}
-            className="w-full mb-3">
+          <Button variant="outline" onPress={handleExportData} className="mb-3 w-full">
             <Icon as={DownloadIcon} className="text-foreground" />
             <Text className="ml-2">Exporter les données (JSON)</Text>
           </Button>
 
           {/* Réinitialiser */}
-          <Button
-            variant="destructive"
-            onPress={() => setShowResetDialog(true)}
-            className="w-full">
+          <Button variant="destructive" onPress={() => setShowResetDialog(true)} className="w-full">
             <Icon as={TrashIcon} className="text-destructive-foreground" />
-            <Text className="text-destructive-foreground ml-2">Réinitialiser l'application</Text>
+            <Text className="ml-2 text-destructive-foreground">Réinitialiser l'application</Text>
           </Button>
         </View>
 
@@ -372,7 +415,8 @@ export default function SettingsScreen() {
           <DialogHeader>
             <DialogTitle>Réinitialiser l'application ?</DialogTitle>
             <DialogDescription>
-              Cette action supprimera toutes vos données : produits, ventes, catégories et paramètres. Cette action est irréversible.
+              Cette action supprimera toutes vos données : produits, ventes, catégories et
+              paramètres. Cette action est irréversible.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-row gap-2">
