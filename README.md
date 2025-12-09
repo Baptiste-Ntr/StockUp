@@ -1,6 +1,8 @@
 # StockUp
 StockUp est une application de gestion de boutique pour les clubs, intégrée à l'écosystème Lynup. Elle permet aux responsables de clubs de gérer facilement leur inventaire, leurs stocks et leurs ventes de produits (merchandising, matériel, etc.).
 
+Pour voir les changelogs : https://stockup.userjot.com/updates
+
 ## ✨ Fonctionnalités principales
 ### Gestion d'inventaire
 Ajout, modification et suppression de produits avec détails (nom, prix, quantité, catégorie).
@@ -32,7 +34,7 @@ Actuellement (phase alpha) :
 
 Avant le passage en production, une authentification sécurisée via Lynup et un stockage serveur seront mis en place.
 
-## 🗺️ Roadmap
+## 🗺️ [Roadmap](https://stockup.userjot.com/roadmap)
 - ✅ Gestion basique d'inventaire (alpha local).
 
 - 🔄 Synchronisation avec Lynup (prochaine version).
@@ -46,10 +48,11 @@ Avant le passage en production, une authentification sécurisée via Lynup et un
 - 🔄 Application mobile (React Native / Expo).
 
 ## 👤 Développé pour l'écosystème Lynup
-StockUp fait partie de l'écosystème Lynup, une plateforme intégrée pour la gestion de clubs. Pour plus d'informations sur Lynup et les autres outils :
+StockUp fait partie de l'écosystème Lynup, une plateforme intégrée pour la gestion de clubs.
 
 ## 📝 Support & Questions
 Pour toute question, suggestion ou bug report :
 
 - Ouvre une issue sur le repository GitHub : https://github.com/Baptiste-Ntr/StockUp/issues
-- Ou contacte l'équipe Lynup directement.
+- Ouvre un feedback sur : https://stockup.userjot.com/board/all
+- Ou contacte l'équipe StockUp directement.
